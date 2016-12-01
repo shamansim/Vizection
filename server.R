@@ -1010,4 +1010,319 @@ shinyServer(function(input, output, session) {
     plotOutput("checkplot", height = input$heightcheckplot)
   })
   
+  # CA
+  # ==
+  
+  contentcontribDataFrame <- reactive({
+    withProgress(message = 'calculating contribution', {
+      incProgress(1/5, detail = "collecting PCA")
+      genesPca <- genesPca()
+      selectedAxis <- as.numeric(input$selectAxisCoA)
+      incProgress(2/5, detail = "calculating")
+      contribution <- abs(genesPca$co[,selectedAxis])/sum(abs(genesPca$co[,selectedAxis])) * 100
+      incProgress(3/5, detail = "checking results")
+      stopifnot(all.equal(sum(contribution), 100))
+      incProgress(4/5, detail = "creating data frame")
+      data.frame("geneName" = rownames(genesPca$co), "contribution" = contribution)
+    })
+  })
+  contribDataFrame <- reactive({
+    contentcontribDataFrame()
+  })
+  
+  contentcontributionBoxplot <- eventReactive(input$generateContributionBoxplot, {
+    withProgress(message = 'contrib boxplot', {
+      incProgress(1/3, detail = "collecting contrib")
+      contribDataFrame <- contribDataFrame()
+      incProgress(2/3, detail = "generating boxplot")
+      boxplot(contribDataFrame$contribution, horizontal = T, main = paste0("Contribution on axis ", input$selectAxisCoA))
+    })
+  })
+  output$contributionBoxplot <- renderPlot({
+    contentcontributionBoxplot()
+  })
+  
+  contentthresholded <- eventReactive(input$applyThreshold, {
+    withProgress(message = 'applying threshold', {
+      incProgress(1/4, detail = "collecting threshold")
+      threshold <- input$nbGenesToKeep
+      contribDataFrame <- contribDataFrame()
+      incProgress(2/4, detail = "filtering contrib data frame")
+      indexesThresholded <- which(contribDataFrame$contribution >= threshold)
+      incProgress(3/4, detail = "creating list")
+      list(
+        names = contribDataFrame$geneName[indexesThresholded],
+        values = contribDataFrame$contribution[indexesThresholded]
+      )
+    })
+  })
+  thresholded <- reactive({
+    contentthresholded()
+  })
+  
+  output$thresholdedPrint <- renderDataTable({
+    as.data.frame(thresholded())
+  })
+  
+  contentnumberGenesThresholded <- eventReactive(input$applyThreshold, {
+    thresholded <- thresholded()
+    paste("Selection of", length(thresholded$names), "genes.")
+  })
+  output$numberGenesThresholded <- renderPrint({
+    contentnumberGenesThresholded()
+  })
+  contentthresholdBoxplot <- eventReactive(input$applyThreshold, {
+    contribDataFrame <- contribDataFrame()
+    boxplot(contribDataFrame$contribution, horizontal = T, main = paste0("Contribution on axis ", input$selectAxisCoA))
+    abline(lty = 2, col = "red", v = input$nbGenesToKeep)
+  })
+  output$thresholdBoxplot <- renderPlot({
+    contentthresholdBoxplot()
+  })
+  
+  #
+  contentcoaGenes <- eventReactive(input$updateCoA, {
+    withProgress(message = 'CoA summary', {
+      incProgress(1/3, detail = "creating thresholded genes and libs")
+      subgenes <- subgenes()
+      thresholded <- thresholded()
+      mainGenes <- subgenes[rownames(subgenes) %in% thresholded$names, ]
+      incProgress(2/3, detail = "dudi.coa")
+      dudi.coa(mainGenes %>% t %>% as.data.frame, scannf = F, nf = 3)
+    })
+  })
+  coaGenes <- reactive({
+    contentcoaGenes()
+  })
+  
+  output$coasummary <- renderPrint({
+    summary(coaGenes())
+  })
+  
+  output$coaeigenvalues <- renderPlot({
+    barplot(coaGenes() %$% eig, xlab = "Eigenvalues")
+  })
+  
+  
+  coaColor <- reactive({
+    if(input$COAcolor == 2){
+      paste(colorsPcaLi())
+    }
+    else if(input$COAcolor == 3){
+      kmeansColor()
+    }
+    else{
+      myColors <- sublibs()$group %>% levels %>% length %>% rainbow() %>% substr(., 1, nchar(.)-2)
+      myColors[sublibs()$group]
+    }
+  })
+  
+  coaGroup <- reactive({
+    if(input$COAcolor == 2){
+      as.factor(colorsPcaLi())
+    }
+    else if(input$COAcolor == 3){
+      as.factor(kmeansColor())
+    }
+    else{
+      sublibs()$group
+    }
+  })
+  
+  ####
+  rangescoa12 <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$COA12dblclick, {
+    brush <- input$COA12brush
+    if (!is.null(brush)) {
+      rangescoa12$x <- c(brush$xmin, brush$xmax)
+      rangescoa12$y <- c(brush$ymin, brush$ymax)
+    } else {
+      rangescoa12$x <- NULL
+      rangescoa12$y <- NULL
+    }
+  })
+  ####
+  coa12 <- eventReactive(input$updateCoAPlots, {
+    coaGenesli <- coaGenes()$li
+    ggplot(coaGenesli, aes(x = Axis1, y = Axis2))
+  })
+  contentinteractCOA12 <- reactive({
+    withProgress(message = 'coa axes 1-2', {
+      incProgress(1/4, detail = "collecting COA")
+      coa12 <- coa12()
+      incProgress(2/4, detail = "collecting colors")
+      coaColor <- coaColor()
+      incProgress(3/4, detail = "creating plot")
+      coa12 +
+        geom_point(color = coaColor) +
+        coord_cartesian(xlim = rangescoa12$x, ylim = rangescoa12$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light() +
+        geom_point(data = coaGenes()$co, aes(x = Comp1, y = Comp2)) +
+        geom_text(data = coaGenes()$co, aes(x = Comp1, y = Comp2, label = rownames(coaGenes()$co)), hjust = 0, nudge_x = 0.05)
+    })
+  })
+  output$interactCOA12 <- renderPlot({
+    contentinteractCOA12()
+  })
+  ####
+  contentdataCOA12 <- reactive({
+    withProgress(message = 'data 1-2', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(coaGenes()$li, input$COA12brush, xvar = "Axis1", yvar = "Axis2")
+      colour <- coaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataCOA12 <- renderDataTable({
+    contentdataCOA12()
+  })
+  
+  ####
+  rangescoa13 <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$COA13dblclick, {
+    brush <- input$COA13brush
+    if (!is.null(brush)) {
+      rangescoa13$x <- c(brush$xmin, brush$xmax)
+      rangescoa13$y <- c(brush$ymin, brush$ymax)
+    } else {
+      rangescoa13$x <- NULL
+      rangescoa13$y <- NULL
+    }
+  })
+  ####
+  coa13 <- eventReactive(input$updateCoAPlots, {
+    coaGenesli <- coaGenes()$li
+    ggplot(coaGenesli, aes(x = Axis1, y = Axis3))
+  })
+  contentinteractCOA13 <- reactive({
+    withProgress(message = 'coa axes 1-2=3', {
+      incProgress(1/4, detail = "collecting COA")
+      coa13 <- coa13()
+      incProgress(2/4, detail = "collecting colors")
+      coaColor <- coaColor()
+      incProgress(3/4, detail = "creating plot")
+      coa13 +
+        geom_point(color = coaColor) +
+        coord_cartesian(xlim = rangescoa13$x, ylim = rangescoa13$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light() +
+        geom_point(data = coaGenes()$co, aes(x = Comp1, y = Comp3)) +
+        geom_text(data = coaGenes()$co, aes(x = Comp1, y = Comp3, label = rownames(coaGenes()$co)), hjust = 0, nudge_x = 0.05)
+    })
+  })
+  output$interactCOA13 <- renderPlot({
+    contentinteractCOA13()
+  })
+  ####
+  contentdataCOA13 <- reactive({
+    withProgress(message = 'data 1-3', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(coaGenes()$li, input$COA13brush, xvar = "Axis1", yvar = "Axis3")
+      colour <- coaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataCOA13 <- renderDataTable({
+    contentdataCOA13()
+  })
+  
+  ####
+  rangescoa32 <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$COA32dblclick, {
+    brush <- input$COA32brush
+    if (!is.null(brush)) {
+      rangescoa32$x <- c(brush$xmin, brush$xmax)
+      rangescoa32$y <- c(brush$ymin, brush$ymax)
+    } else {
+      rangescoa32$x <- NULL
+      rangescoa32$y <- NULL
+    }
+  })
+  ####
+  coa32 <- eventReactive(input$updateCoAPlots, {
+    coaGenesli <- coaGenes()$li
+    ggplot(coaGenesli, aes(x = Axis3, y = Axis2))
+  })
+  contentinteractCOA32 <- reactive({
+    withProgress(message = 'coa axes 3-2', {
+      incProgress(1/4, detail = "collecting COA")
+      coa32 <- coa32()
+      incProgress(2/4, detail = "collecting colors")
+      coaColor <- coaColor()
+      incProgress(3/4, detail = "creating plot")
+      coa32 +
+        geom_point(color = coaColor) +
+        coord_cartesian(xlim = rangescoa32$x, ylim = rangescoa32$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light() +
+        geom_point(data = coaGenes()$co, aes(x = Comp3, y = Comp2)) +
+        geom_text(data = coaGenes()$co, aes(x = Comp3, y = Comp2, label = rownames(coaGenes()$co)), hjust = 0, nudge_x = 0.05)
+    })
+  })
+  output$interactCOA32 <- renderPlot({
+    contentinteractCOA32()
+  })
+  ####
+  contentdataCOA32 <- reactive({
+    withProgress(message = 'data 3-2', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(coaGenes()$li, input$COA32brush, xvar = "Axis3", yvar = "Axis2")
+      colour <- coaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataCOA32 <- renderDataTable({
+    contentdataCOA32()
+  })
+  
+  contentcoa3D <- eventReactive(input$generatecoa3d, {
+    withProgress(message = 'coa 3D', {
+      incProgress(1/4, detail = "collecting")
+      coaGenesli <- coaGenes()$li
+      incProgress(2/4, detail = "collecting colors")
+      coaColor <- coaColor()
+      coaGroup <- coaGroup()
+      incProgress(3/4, detail = "creating 3D plot")
+      plot_ly(data = coaGenesli, x = coaGenesli$Axis1, y = coaGenesli$Axis2, z = coaGenesli$Axis3,
+              type = "scatter3d", mode = "markers", marker = list(size = input$coa3ddotsize),
+              color = coaGroup, colors = coaColor,
+              text = sublibs()$samplename)  %>% 
+        layout(scene = list(
+          xaxis = list(title = "Axis1"), 
+          yaxis = list(title = "Axis2"), 
+          zaxis = list(title = "Axis3")))
+    })
+  })
+  output$coa3D <- renderPlotly({
+    contentcoa3D()
+  })
+  
 })

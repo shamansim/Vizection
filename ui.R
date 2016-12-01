@@ -381,7 +381,56 @@ dashboardPage(
         tags$h4(class = "titre", "Correspondence Analysis"),
         helpText("Need a description..."),
         tags$hr(),
-        helpText("Nothing more here !")
+        helpText("Needs to have generated PCA first."),
+        tabsetPanel(
+          tabPanel("Settings",
+                   fluidRow(
+                     selectInput("selectAxisCoA", h4("PCA Axis of interest on which we find the interesting genes", style = "color: rgb(0, 123, 16)"), choices = list("Axis 1" = 1, "Axis 2" = 2, "Axis 3" = 3), selected = 1)
+                   ),
+                   fluidRow(column(1, actionButton("generateContributionBoxplot", "Generate contribution boxplot"))),
+                   fluidRow(
+                     plotOutput("contributionBoxplot", width = "950px", height = "200px")
+                   ),
+                   fluidRow(
+                     numericInput("nbGenesToKeep", h4("Threshold", style = "color: rgb(0, 123, 16)"), min = 0, max = 100, value = 20, step = 1)
+                   ),
+                   fluidRow(column(1, actionButton("applyThreshold", "Apply threshold"))),
+                   fluidRow(
+                     column(3, verbatimTextOutput("numberGenesThresholded"))
+                   ),
+                   fluidRow(
+                     plotOutput("thresholdBoxplot", width = "950px", height = "200px")
+                   ),
+                   fluidRow(
+                     column(6, dataTableOutput("thresholdedPrint"))
+                   )
+          ),#Settings
+          tabPanel("Summary",
+                   fluidRow(column(1, actionButton("updateCoA", "Update CoA"))),
+                   plotOutput("coaeigenvalues"),
+                   verbatimTextOutput("coasummary")
+          ),#Summary
+          tabPanel("Plots",
+                   radioButtons("COAcolor", "Color points by:", choices = list("biological groups" = 1, "dendrogram clusters" = 2, "k-means clusters" = 3), selected = 1),
+                   tabsetPanel(
+                     tabPanel("2D",
+                              fluidRow(column(1, actionButton("updateCoAPlots", "Update plots"))),
+                              tags$br(),
+                              plotOutput("interactCOA12", brush = brushOpts(id = "COA12brush", resetOnNew = T), width = 470, dblclick = "COA12dblclick"),
+                              dataTableOutput("dataCOA12"),
+                              plotOutput("interactCOA13", brush = brushOpts(id = "COA13brush", resetOnNew = T), width = 470, dblclick = "COA13dblclick"),
+                              dataTableOutput("dataCOA13"),
+                              plotOutput("interactCOA32", brush = brushOpts(id = "COA32brush", resetOnNew = T), width = 470, dblclick = "COA32dblclick"),
+                              dataTableOutput("dataCOA32")
+                     ),#2D
+                     tabPanel("3D",
+                              sliderInput("coa3ddotsize", "Dot size: ", min = 1, max = 20, step = 1, value = 2),
+                              actionButton("generatecoa3d", "Update plot"),
+                              plotlyOutput("coa3D", width = "950px", height = "750px")
+                     )#3D
+                   )#tabsetPanel
+          )#Plots
+        )#TabsetPanel
       ),#tabItems CA
 
       # EXPORT
