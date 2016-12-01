@@ -440,7 +440,20 @@ dashboardPage(
         tags$h4(class = "titre", "Export"),
         helpText("Need a description..."),
         tags$hr(),
-        helpText("Nothing for now...")
+        helpText("Do not forget to 'validate parameters'."),
+        helpText("Exportation is done in RDS format."),
+        fluidRow(
+          column(3, textInput("genesRDSName", label = h4("Genes : choose a name", style = "color: rgb(0, 16, 148)", align = "center"), value = paste0("genes_", gsub("\\s", "_", gsub("\\d{2}[:::]\\d{2}[:::]\\d{2}\\s", "", date())), ".rds")))
+        ),
+        fluidRow(
+          column(1, actionButton("exportGenes", "Export 'genes' with current selection"))
+        ),
+        fluidRow(
+          column(3, textInput("libsRDSName", label = h4("Libs : choose a name", style = "color: rgb(0, 16, 148)", align = "center"), value = paste0("libs_", gsub("\\s", "_", gsub("\\d{2}[:::]\\d{2}[:::]\\d{2}\\s", "", date())), ".rds")))
+        ),
+        fluidRow(
+          column(1, actionButton("exportLibs", "Export 'libs' with current selection"))
+        )
       ),#tabItems export
       
       # ABOUT

@@ -1325,4 +1325,21 @@ shinyServer(function(input, output, session) {
     contentcoa3D()
   })
   
+  # EXPORT
+  # ======
+  
+  observeEvent(input$exportGenes, {
+    withProgress(message = "Exporting genes", {
+      incProgress(1/2, detail = "processing")
+      saveRDS(subgenes(), file = file.path(getwd(), paste(input$genesRDSName)))
+    })
+  })
+  
+  observeEvent(input$exportLibs, {
+    withProgress(message = "Exporting libs", {
+      incProgress(1/2, detail = "processing")
+      saveRDS(sublibs(), file = paste(input$libsRDSName))
+    })
+  })
+  
 })
