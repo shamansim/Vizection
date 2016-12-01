@@ -394,4 +394,114 @@ shinyServer(function(input, output, session) {
     contentheatmapGenes()
   })
   
+  # PCoA AND KMEANS
+  # ===============
+  
+  contentgenesPCoA <- eventReactive(input$updatePCoA,{
+    withProgress(message = 'PCoA', {
+      incProgress(1/3, detail = "collecting data")
+      distCorMat <- distCorMat()
+      incProgress(2/3, detail = "calculating")
+      dudi.pco(distCorMat, scannf = F, nf = 2)
+    })
+  })
+  genesPCoA <- reactive({
+    contentgenesPCoA()
+  })
+  output$pcoasummary <- renderPrint({
+    summary(genesPCoA())
+  })
+  #
+  rangespcoa12 <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$pcoa12dblclick, {
+    brush <- input$pcoa12brush
+    if(!is.null(brush)) {
+      rangespcoa12$x <- c(brush$xmin, brush$xmax)
+      rangespcoa12$y <- c(brush$ymin, brush$ymax)
+    } else {
+      rangespcoa12$x <- NULL
+      rangespcoa12$y <- NULL
+    }
+  })
+  pcoa12 <- eventReactive(input$updatePCoA, {
+    genesPCoAli <- genesPCoA()$li
+    ggplot(genesPCoAli, aes(x = A1, y = A2))
+  })
+  contentpcoagenes12 <- reactive({
+    withProgress(message = 'plot PCoA', {
+      incProgress(1/4, detail = "collecting PCoA")
+      pcoa12 <- pcoa12()
+      incProgress(2/4, detail = "collecting k-means colors")
+      kmeansColor <- kmeansColor()
+      incProgress(3/4, detail = "creating plot")
+      pcoa12 +
+        geom_point(color = kmeansColor) +
+        coord_cartesian(xlim = rangespcoa12$x, ylim = rangespcoa12$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light() +
+        theme(legend.position = "none")
+    })
+  })
+  output$pcoagenes12 <- renderPlot({
+    contentpcoagenes12()
+  })
+  contentdataPCoA <- reactive({
+    withProgress(message = 'data PCoA', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(genesPCoA()$li, input$pcoa12brush, xvar = "A1", yvar = "A2")
+      colour <- kmeansColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataPCoA <- renderDataTable({
+    contentdataPCoA()
+  })
+  #
+  contentSSE <- eventReactive(input$updateSSE, {
+    SSE <- function(mydata, title = ""){
+      wss <- (nrow(mydata)-1)*sum(apply(mydata,2,var))
+      for (i in 2:input$SSElength) wss[i] <- sum(kmeans(mydata, centers=i)$withinss)
+      plot(1:input$SSElength, wss, type="b", xlab="Number of Clusters", ylab="Within groups sum of squares", main = title)
+      for(i in wss){abline(h = i, lty = 2, col = "grey")}
+    }
+    SSE(genesPCoA()$li[, c(1, 2)])
+  })
+  output$SSE <- renderPlot({
+    contentSSE()
+  })
+  #
+  contentpcoakmeans <- eventReactive(input$updatekmeans, {
+    withProgress(message = 'kmeans PCoA', {
+      incProgress(1/4, detail = "performing kmeans")
+      kmeanspco <- kmeans(genesPCoA()$li[, c(1, 2)], input$kmeansClusters)
+      incProgress(2/4, detail = "extracting clusters")
+      kmeanspcofitted <- fitted(kmeanspco)
+      incProgress(3/4, detail = "grouping information")
+      data.frame("sampleName" = rownames(genesPCoA()$li), "cluster" = kmeanspcofitted %>% rownames() %>% as.factor(), "centroidX" = kmeanspcofitted[, 1], "centroidY" = kmeanspcofitted[, 2])
+    })
+  })
+  pcoakmeans <- reactive({
+    contentpcoakmeans()
+  })
+  contentkmeansColor <- eventReactive(input$updatekmeans, {
+    withProgress(message = 'colors PCoA', {
+      incProgress(1/4, detail = "attribution")
+      pcoakmeans <- pcoakmeans()
+      colorvector <- rainbow(input$kmeansClusters) %>% substr(., 1, nchar(.)-2)
+      colorvector[pcoakmeans$cluster]
+    })
+  })
+  kmeansColor <- reactive({
+    contentkmeansColor()
+  })
+  
 })

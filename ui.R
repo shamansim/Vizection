@@ -260,7 +260,30 @@ dashboardPage(
         tags$h4(class = "titre", "K-means"),
         helpText("Need a description..."),
         tags$hr(),
-        helpText("Nothing more here !")
+        helpText("Do not forget to 'validate parameters'."),
+        tabsetPanel(
+          tabPanel("PCoA and k-means clustering",
+                   helpText("1 - Perform PCoA first"),
+                   helpText("2 - Check for optimal number of clusters"),
+                   helpText("3 - Perform k-means"),
+                   fluidRow(column(1, actionButton("updatePCoA", "Update PCoA"))),
+                   fluidRow(
+                     column(4, numericInput("kmeansClusters", h4("Number of clusters", style = "color: rgb(0, 123, 16)"), min = 1, max = nrow(libs), value = 1, step = 1)
+                     )
+                   ),
+                   fluidRow(column(1, actionButton("updatekmeans", "Update k-means"))),
+                   plotOutput("pcoagenes12", brush = brushOpts(id = "pcoa12brush", resetOnNew = T), width = 470, dblclick = "pcoa12dblclick"),
+                   dataTableOutput("dataPCoA"),
+                   verbatimTextOutput("pcoasummary")
+          ),
+          tabPanel("SSE",
+                   helpText("Within sum of squared error plot."),
+                   helpText("Needs to perform PCoA first."),
+                   sliderInput("SSElength", "Number of clusters to display", min = 2, max = 100, value = 10, step = 1),
+                   fluidRow(column(1, actionButton("updateSSE", "Update SSE plot"))),
+                   plotOutput("SSE")
+          )
+        )
       ),#tabItem k-means
 
       # PCA
