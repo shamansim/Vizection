@@ -504,4 +504,510 @@ shinyServer(function(input, output, session) {
     contentkmeansColor()
   })
   
+  # PCA
+  # ===
+  
+  contentgenesPCA <- eventReactive(input$updatePCASummary, {
+    withProgress(message = 'PCA summary', {
+      incProgress(1/3, detail = "TPM")
+      genesTpm <- subgenes() %>% TPM %>% t
+      incProgress(2/3, detail = "dudi.pca")
+      dudi.pca(genesTpm[, -1], center = T, scale = F, scannf = F, nf = 3)
+    })
+  })
+  genesPca <- reactive({
+    contentgenesPCA()
+  })
+  
+  output$pcasummary <- renderPrint({
+    summary(genesPca())
+  })
+  
+  output$eigenvalues <- renderPlot({
+    barplot(genesPca() %$% eig, xlab = "Eigenvalues")
+  })
+  
+  #
+  contentcomponents1 <- eventReactive(input$updatePCAComponents, {
+    withProgress(message = 'components1', {
+      incProgress(1/4, detail = "collecting PCA")
+      genesPca <- genesPca()
+      incProgress(2/4, detail = 'generating list')
+      genesCoComp1 <- pcaCompGenesList(genesPca$co, 1)
+      incProgress(3/4, detail = 'generating plot')
+      plotHTB(genesCoComp1, 1, input$nbDispGenes)
+    })
+  })
+  output$components1 <- renderPlot({
+    contentcomponents1()
+  })
+  
+  contentcomponents2 <- eventReactive(input$updatePCAComponents, {
+    withProgress(message = 'components2', {
+      incProgress(1/4, detail = "collecting PCA")
+      genesPca <- genesPca()
+      incProgress(2/4, detail = 'generating list')
+      genesCoComp2 <- pcaCompGenesList(genesPca$co, 2)
+      incProgress(3/4, detail = 'generating plot')
+      plotHTB(genesCoComp2, 2, input$nbDispGenes)
+    })
+  })
+  output$components2 <- renderPlot({
+    contentcomponents2()
+  })
+  
+  contentcomponents3 <- eventReactive(input$updatePCAComponents, {
+    withProgress(message = 'components3', {
+      incProgress(1/4, detail = "collecting PCA")
+      genesPca <- genesPca()
+      incProgress(2/4, detail = 'generating list')
+      genesCoComp3 <- pcaCompGenesList(genesPca$co, 3)
+      incProgress(3/4, detail = 'generating plot')
+      plotHTB(genesCoComp3, 3, input$nbDispGenes)
+    })
+  })
+  output$components3 <- renderPlot({
+    contentcomponents3()
+  })
+  
+  pcaColor <- reactive({
+    if(input$PCAcolor == 2){
+      paste(colorsPcaLi())
+    }
+    else if(input$PCAcolor == 3){
+      kmeansColor()
+    }
+    else{
+      myColors <- sublibs()$group %>% levels %>% length %>% rainbow() %>% substr(., 1, nchar(.)-2)
+      myColors[sublibs()$group]
+    }
+  })
+  
+  pcaGroup <- reactive({
+    if(input$PCAcolor == 2){
+      as.factor(colorsPcaLi())
+    }
+    else if(input$PCAcolor == 3){
+      as.factor(kmeansColor())
+    }
+    else{
+      sublibs()$group
+    }
+  })
+  
+  # ax 12
+  ####
+  ranges12li <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA12lidblclick, {
+    brush <- input$PCA12librush
+    if (!is.null(brush)) {
+      ranges12li$x <- c(brush$xmin, brush$xmax)
+      ranges12li$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges12li$x <- NULL
+      ranges12li$y <- NULL
+    }
+  })
+  ####
+  g12li <- eventReactive(input$updatePCAPlots, {
+    genesPcali <- genesPca()$li
+    if(input$showEllipse){
+      ggplot(genesPcali, aes(x = Axis1, y = Axis2, group = pcaGroup(), color = pcaColor(), fill = pcaColor())) + stat_ellipse(aes(color = pcaColor(), fill = pcaColor()))}
+    else {
+      ggplot(genesPcali, aes(x = Axis1, y = Axis2, group = pcaGroup(), color = pcaColor()))
+    }
+  })
+  contentinteractPCA12li <- reactive({
+    withProgress(message = 'li axes 1-2', {
+      incProgress(1/4, detail = "collecting PCA")
+      g12li <- g12li()
+      incProgress(2/4, detail = "collecting colors")
+      pcaColor <- pcaColor()
+      incProgress(3/4, detail = "creating plot")
+      g12li +
+        geom_point(color = pcaColor) +
+        coord_cartesian(xlim = ranges12li$x, ylim = ranges12li$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light() +
+        theme(legend.position = "none")
+    })
+  })
+  output$interactPCA12li <- renderPlot({
+    contentinteractPCA12li()
+  })
+  ####
+  contentdataPCA12li <- reactive({
+    withProgress(message = 'data 1-2', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(genesPca()$li, input$PCA12librush, xvar = "Axis1", yvar = "Axis2")
+      colour <- pcaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataPCA12li <- renderDataTable({
+    contentdataPCA12li()
+  })
+  #####
+  ranges12co <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA12codblclick, {
+    brush <- input$PCA12cobrush
+    if (!is.null(brush)) {
+      ranges12co$x <- c(brush$xmin, brush$xmax)
+      ranges12co$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges12co$x <- NULL
+      ranges12co$y <- NULL
+    }
+  })
+  #####
+  g12co <- eventReactive(input$updatePCAPlots, {
+    genesPcaco <- genesPca()$co
+    ggplot(genesPcaco, aes(x = Comp1, y = Comp2))
+  })
+  contentinteractPCA12co <- reactive({
+    withProgress(message = 'co axes 1-2', {
+      incProgress(1/3, detail = "collecting PCA")
+      g12co <- g12co()
+      incProgress(2/3, detail = "creating plot")
+      g12co +
+        geom_segment(aes(x=0, y=0, xend=Comp1, yend=Comp2)) +
+        coord_cartesian(xlim = ranges12co$x, ylim = ranges12co$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light()
+    })
+  })
+  output$interactPCA12co <- renderPlot({
+    contentinteractPCA12co()
+  })
+  #####
+  contentdataPCA12co <- reactive({
+    withProgress(message = 'data 1-2', {
+      incProgress(1/3, detail = "filtering")
+      res <- brushedPoints(genesPca()$co, input$PCA12cobrush, xvar = "Comp1", yvar = "Comp2")
+      incProgress(2/3, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE))
+    })
+  })
+  output$dataPCA12co <- renderDataTable({
+    contentdataPCA12co()
+  })
+  
+  # ax 13
+  ####
+  ranges13li <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA13lidblclick, {
+    brush <- input$PCA13librush
+    if (!is.null(brush)) {
+      ranges13li$x <- c(brush$xmin, brush$xmax)
+      ranges13li$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges13li$x <- NULL
+      ranges13li$y <- NULL
+    }
+  })
+  ####
+  g13li <- eventReactive(input$updatePCAPlots, {
+    genesPcali <- genesPca()$li
+    ggplot(genesPcali, aes(x = Axis1, y = Axis3))
+  })
+  contentinteractPCA13li <- reactive({
+    withProgress(message = 'li axes 1-3', {
+      incProgress(1/4, detail = "collecting PCA")
+      g13li <- g13li()
+      incProgress(2/4, detail = "collecting colors")
+      pcaColor <- pcaColor()
+      incProgress(3/4, detail = "creating plot")
+      g13li +
+        geom_point(color = pcaColor) +
+        coord_cartesian(xlim = ranges13li$x, ylim = ranges13li$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light()
+    })
+  })
+  output$interactPCA13li <- renderPlot({
+    contentinteractPCA13li()
+  })
+  ####
+  contentdataPCA13li <- reactive({
+    withProgress(message = 'data 1-3', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(genesPca()$li, input$PCA13librush, xvar = "Axis1", yvar = "Axis3")
+      colour <- pcaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataPCA13li <- renderDataTable({
+    contentdataPCA13li()
+  })
+  #####
+  ranges13co <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA13codblclick, {
+    brush <- input$PCA13cobrush
+    if (!is.null(brush)) {
+      ranges13co$x <- c(brush$xmin, brush$xmax)
+      ranges13co$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges13co$x <- NULL
+      ranges13co$y <- NULL
+    }
+  })
+  #####
+  g13co <- eventReactive(input$updatePCAPlots, {
+    genesPcaco <- genesPca()$co
+    ggplot(genesPcaco, aes(x = Comp1, y = Comp3))
+  })
+  contentinteractPCA13co <- reactive({
+    withProgress(message = 'co axes 1-3', {
+      incProgress(1/3, detail = "collecting PCA")
+      g13co <- g13co()
+      incProgress(2/3, detail = "creating plot")
+      g13co +
+        geom_segment(aes(x=0, y=0, xend=Comp1, yend=Comp3)) +
+        coord_cartesian(xlim = ranges13co$x, ylim = ranges13co$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light()
+    })
+  })
+  output$interactPCA13co <- renderPlot({
+    contentinteractPCA13co()
+  })
+  #####
+  contentdataPCA13co <- reactive({
+    withProgress(message = 'data 1-3', {
+      incProgress(1/3, detail = "filtering")
+      res <- brushedPoints(genesPca()$co, input$PCA13cobrush, xvar = "Comp1", yvar = "Comp3")
+      incProgress(2/3, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE))
+    })
+  })
+  output$dataPCA13co <- renderDataTable({
+    contentdataPCA13co()
+  })
+  
+  # ax 32
+  ####
+  ranges32li <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA32lidblclick, {
+    brush <- input$PCA32librush
+    if (!is.null(brush)) {
+      ranges32li$x <- c(brush$xmin, brush$xmax)
+      ranges32li$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges32li$x <- NULL
+      ranges32li$y <- NULL
+    }
+  })
+  ####
+  g32li <- eventReactive(input$updatePCAPlots, {
+    genesPcali <- genesPca()$li
+    ggplot(genesPcali, aes(x = Axis3, y = Axis2))
+  })
+  contentinteractPCA32li <- reactive({
+    withProgress(message = 'li axes 3-2', {
+      incProgress(1/4, detail = "collecting PCA")
+      g32li <- g32li()
+      incProgress(2/4, detail = "collecting colors")
+      pcaColor <- pcaColor()
+      incProgress(3/4, detail = "creating plot")
+      g32li +
+        geom_point(color = pcaColor) +
+        coord_cartesian(xlim = ranges32li$x, ylim = ranges32li$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light()
+    })
+  })
+  output$interactPCA32li <- renderPlot({
+    contentinteractPCA32li()
+  })
+  ####
+  contentdataPCA32li <- reactive({
+    withProgress(message = 'data 3-2', {
+      incProgress(1/4, detail = "collecting sulibs")
+      sublibs <- sublibs()
+      incProgress(2/4, detail = "filtering")
+      res0 <- brushedPoints(genesPca()$li, input$PCA32librush, xvar = "Axis3", yvar = "Axis2")
+      colour <- pcaColor()
+      resCol <- cbind(colour, sublibs[, -1])
+      res <- resCol[rownames(resCol) %in% rownames(res0), ]
+      colour2 <- res$colour
+      incProgress(3/4, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE)) %>% formatStyle(
+        "colour", target = 'row', backgroundColor = styleEqual(colour2, colour2)
+      )
+    })
+  })
+  output$dataPCA32li <- renderDataTable({
+    contentdataPCA32li()
+  })
+  #####
+  ranges32co <- reactiveValues(x = NULL, y = NULL)
+  observeEvent(input$PCA32codblclick, {
+    brush <- input$PCA32cobrush
+    if (!is.null(brush)) {
+      ranges32co$x <- c(brush$xmin, brush$xmax)
+      ranges32co$y <- c(brush$ymin, brush$ymax)
+    } else {
+      ranges32co$x <- NULL
+      ranges32co$y <- NULL
+    }
+  })
+  #####
+  g32co <- eventReactive(input$updatePCAPlots, {
+    genesPcaco <- genesPca()$co
+    ggplot(genesPcaco, aes(x = Comp3, y = Comp2))
+  })
+  contentinteractPCA32co <- reactive({
+    withProgress(message = 'co axes 3-2', {
+      incProgress(1/3, detail = "collecting PCA")
+      g32co <- g32co()
+      incProgress(2/3, detail = "creating plot")
+      g32co +
+        geom_segment(aes(x=0, y=0, xend=Comp3, yend=Comp2)) +
+        coord_cartesian(xlim = ranges32co$x, ylim = ranges32co$y) +
+        geom_vline(xintercept = 0, alpha = 0.2) +
+        geom_hline(yintercept = 0, alpha = 0.2) +
+        theme_light()
+    })
+  })
+  output$interactPCA32co <- renderPlot({
+    contentinteractPCA32co()
+  })
+  #####
+  contentdataPCA32co <- reactive({
+    withProgress(message = 'data 3-2', {
+      incProgress(1/3, detail = "filtering")
+      res <- brushedPoints(genesPca()$co, input$PCA32cobrush, xvar = "Comp3", yvar = "Comp2")
+      incProgress(2/3, detail = "creating datatable")
+      datatable(res, options = list(scrollX = TRUE))
+    })
+  })
+  output$dataPCA32co <- renderDataTable({
+    contentdataPCA32co()
+  })
+  
+  contentpca3D <- eventReactive(input$generatepca3d, {
+    withProgress(message = 'pca 3D', {
+      incProgress(1/4, detail = "collecting PCA")
+      pcaGenesli <- genesPca()$li
+      incProgress(2/4, detail = "collecting colors")
+      pcaColor <- pcaColor()
+      pcaGroup <- pcaGroup()
+      incProgress(3/4, detail = "creating 3D plot")
+      plot_ly(data = pcaGenesli, x = pcaGenesli$Axis1, y = pcaGenesli$Axis2, z = pcaGenesli$Axis3,
+              type = "scatter3d", mode = "markers", marker = list(size = input$pca3ddotsize),
+              color = pcaGroup, colors = pcaColor,
+              text = sublibs()$samplename) %>% 
+        layout(scene = list(
+                 xaxis = list(title = "Axis1"), 
+                 yaxis = list(title = "Axis2"), 
+                 zaxis = list(title = "Axis3")))
+    })
+  })
+  output$pca3D <- renderPlotly({
+    contentpca3D()
+  })
+  
+  #
+  contentcheckplot <- eventReactive(input$updatecheckplot, {
+    withProgress(message = 'checkplot', {
+      incProgress(1/4, detail = "data collection")
+      if(input$dataCheckplot == "total"){
+        d <- genes[paste(input$geneNamescheckplot), ] %>% t %>% tbl_df() %T>% setnames("geneName")
+        d$group <-as.factor(libs$group)
+      }
+      else {
+        subgenes <- subgenes()
+        sublibs <- sublibs()
+        d <- subgenes[paste(input$geneNamescheckplot), ] %>% t %>% tbl_df() %T>% setnames("geneName")
+        d$group <- as.factor(sublibs$group)
+      }
+      incProgress(2/4, detail = "generation")
+      g <- d %>% ggplot(aes(geneName), group = group) +
+        geom_histogram(binwidth = 1) +
+        theme_light() +
+        xlab(paste(input$geneNamescheckplot))
+      incProgress(3/4, detail = "(faceting) and annotating")
+      if(input$facetcheckplot){
+        g <- g + facet_grid(group ~ .)
+      }
+      if(input$sampleNamescheckplot != "None"){
+        if(input$dataCheckplot == "total"){
+          xvalue <- genes[paste(input$geneNamescheckplot), paste(input$sampleNamescheckplot)]
+          yvalue <- sum(genes[paste(input$geneNamescheckplot), ] == xvalue)
+          g <- g + geom_vline(xintercept = xvalue, colour = "red", linetype = "dashed") +
+            annotate("text", x = xvalue, y = yvalue + 1, label = paste(input$sampleNamescheckplot), colour = "red")
+        } else {
+          subgenes <- subgenes()
+          xvalue <- subgenes[paste(input$geneNamescheckplot), paste(input$sampleNamescheckplot)]
+          yvalue <- sum(subgenes[paste(input$geneNamescheckplot), ] == xvalue)
+          g <- g + geom_vline(xintercept = xvalue, colour = "red", linetype = "dashed") +
+            annotate("text", x = xvalue, y = yvalue + 1, label = paste(input$sampleNamescheckplot), colour = "red")
+        }
+      }
+      g
+    })
+  })
+  output$checkplot <- renderPlot({
+    contentcheckplot()
+  })
+  
+  contentgeneNamescheckplotUI <- eventReactive(input$updatelistcheckplot, {
+    withProgress(message = 'checkplot genes', {
+      incProgress(1/3, detail = "searching...")
+      if(input$dataCheckplot == "total"){
+        checkplotGrep <- rownames(genes) %>% grep(input$geneNameCheckplot, .) %>% rownames(genes)[.]
+      } else {
+        checkplotGrep <- rownames(subgenes()) %>% grep(input$geneNameCheckplot, .) %>% rownames(subgenes())[.]
+      }
+      incProgress(2/3, detail = "creating UI")
+      selectInput("geneNamescheckplot", "Gene name:", c("None", checkplotGrep), selected = "None")
+    })
+  })
+  output$geneNamescheckplotUI <- renderUI({
+    contentgeneNamescheckplotUI()
+  })
+  
+  contentsampleNamescheckplotUI <- eventReactive(input$updatelistcheckplot, {
+    withProgress(message = 'checkplot samples', {
+      incProgress(1/2, detail = "data collection")
+      if(input$dataCheckplot == "total"){
+        selectInput("sampleNamescheckplot", "Sample name:",
+                    choices = c("None", paste(rownames(libs))), selected = "None"
+        )
+      } else {
+        selectInput("sampleNamescheckplot", "Sample name:",
+                    choices = c("None", paste(rownames(sublibs()))), selected = "None"
+        )
+      }
+    })
+  })
+  output$sampleNamescheckplotUI <- renderUI({
+    contentsampleNamescheckplotUI()
+  })
+  
+  output$checkplotUI <- renderUI({
+    plotOutput("checkplot", height = input$heightcheckplot)
+  })
+  
 })

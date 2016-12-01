@@ -293,7 +293,85 @@ dashboardPage(
         tags$h4(class = "titre", "Principal Components Analysis"),
         helpText("Need a description..."),
         tags$hr(),
-        helpText("Nothing for now...")
+        helpText("Do not forget to 'validate parameters'."),
+        tabsetPanel(
+          tabPanel("Summary",
+                   fluidRow(column(1, actionButton("updatePCASummary", "Update PCA"))),
+                   plotOutput("eigenvalues"),
+                   verbatimTextOutput("pcasummary")
+          ),
+          tabPanel("Components",
+                   fluidRow(column(1, actionButton("updatePCAComponents", "Update components"))),
+                   fluidRow(
+                     sliderInput("nbDispGenes", "How many genes:", min = 1, max = 100, value = 25, step = 1)
+                   ),
+                   fluidRow(
+                     plotOutput("components1"),
+                     plotOutput("components2"),
+                     plotOutput("components3")
+                   )
+          ),
+          tabPanel("Plots",
+                   fluidRow(
+                     column(2, radioButtons("PCAcolor", "Color points by:", choices = list("biological groups" = 1, "dendrogram clusters" = 2, "k-means clusters" = 3), selected = 1)),
+                     column(2, checkboxInput("showEllipse", "Show ellipse(s)", value = F))
+                   ),
+                   tabsetPanel(
+                     tabPanel("2D",
+                              fluidRow(column(1, actionButton("updatePCAPlots", "Update plots"))),
+                              #
+                              fluidRow(
+                                column(6, plotOutput("interactPCA12li", brush = brushOpts(id = "PCA12librush", resetOnNew = T), width = 470, dblclick = "PCA12lidblclick"), align="center"),
+                                column(6, plotOutput("interactPCA12co", brush = brushOpts(id = "PCA12cobrush", resetOnNew = T), width = 470, dblclick = "PCA12codblclick"), align="center")
+                              ),
+                              fluidRow(
+                                column(6, dataTableOutput("dataPCA12li")),
+                                column(6, dataTableOutput("dataPCA12co"))
+                              ),
+                              #
+                              fluidRow(
+                                column(6, plotOutput("interactPCA13li", brush = brushOpts(id = "PCA13librush", resetOnNew = T), width = 470, dblclick = "PCA13lidblclick"), align="center"),
+                                column(6, plotOutput("interactPCA13co", brush = brushOpts(id = "PCA13cobrush", resetOnNew = T), width = 470, dblclick = "PCA13codblclick"), align="center")
+                              ),
+                              fluidRow(
+                                column(6, dataTableOutput("dataPCA13li")),
+                                column(6, dataTableOutput("dataPCA13co"))
+                              ),
+                              #
+                              fluidRow(
+                                column(6, plotOutput("interactPCA32li", brush = brushOpts(id = "PCA32librush", resetOnNew = T), width = 470, dblclick = "PCA32lidblclick"), align="center"),
+                                column(6, plotOutput("interactPCA32co", brush = brushOpts(id = "PCA32cobrush", resetOnNew = T), width = 470, dblclick = "PCA32codblclick"), align="center")
+                              ),
+                              fluidRow(
+                                column(6, dataTableOutput("dataPCA32li")),
+                                column(6, dataTableOutput("dataPCA32co"))
+                              )
+                     ),#2D
+                     tabPanel("3D",
+                              sliderInput("pca3ddotsize", "Dot size: ", min = 1, max = 20, step = 1, value = 2),
+                              actionButton("generatepca3d", "Update plot"),
+                              plotlyOutput("pca3D", width = "950px", height = "750px")
+                     )#3D
+                   )#tabsetPanel Plots
+          ),#tabsetPanel Plots
+          tabPanel("Checkplot",
+                   fluidRow(column(2, radioButtons("dataCheckplot", "Dataset:", list("Total" = "total", "Selection" = "selection"), selected = "selection"))),
+                   fluidRow(
+                     column(2, textInput("geneNameCheckplot", label = "Gene name (or part of it):", value = "geneName...")),
+                     column(1, actionButton("updatelistcheckplot", "Search gene"))
+                   ),
+                   fluidRow(
+                     column(2, uiOutput("geneNamescheckplotUI")),
+                     column(2, uiOutput("sampleNamescheckplotUI"))
+                   ),
+                   fluidRow(
+                     column(2, numericInput("heightcheckplot", "Plot height", min = 250, max = 10000, value = 250)),
+                     column(2, checkboxInput("facetcheckplot", label = "Separate by group", value = FALSE)),
+                     column(1, actionButton("updatecheckplot", "Update checkplot"))
+                   ),
+                   uiOutput("checkplotUI")
+          )
+        )
       ),#tabItems PCA
 
       # CA
