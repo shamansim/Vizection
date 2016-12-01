@@ -1,9 +1,29 @@
+# loading required library
+library(shiny)
+library(shinydashboard)
+library(ade4)
+library(adegraphics)
+library(magrittr)
+library(dplyr)
+library(ggplot2)
+library(data.table)
+library(colorspace)
+library(smallCAGEqc)
+library(dendextend)
+library(DT)
+library(plotly)
+
+# BEGIN shiny app
 dashboardPage(
   
+  # HEADER
+  # ------
   dashboardHeader(title = tags$img(src = "vizection_white.png", alt = "Vizection", height = "40"),
     dropdownMenuOutput("tasksMenu")
   ),#dashboardHeader
   
+  # SIDEBAR
+  # -------
   dashboardSidebar(#width = 450,
     
     sidebarMenu(id = "sidebarmenu",
@@ -30,6 +50,8 @@ dashboardPage(
     
   ),#dashboardSidebar
   
+  # BODY
+  # ----
   dashboardBody(
     
     tags$head(
@@ -133,6 +155,7 @@ dashboardPage(
     conditionalPanel(condition = "input.sidebarmenu == 'selection'",
       tags$i(class = "fa fa-check-square-o fa-5x"),
       tags$h4(class = "titre", "Selection"),
+      helpText("Please choose a filter on the 'count' column [libs table] (0 for none) then select the groups. You can then update the samples and make your selection. Do not forget to update the selection and validate."),
       tags$hr(),
       tags$br(),
       numericInput("nbFilterExtracted", "Filter (counts)", min = 0, value = 0, step = 1),
@@ -161,6 +184,7 @@ dashboardPage(
       tabItem(tabName = "home",
         tags$i(class = "fa fa-home fa-5x"),
         tags$h4(class = "titre", "General information"),
+        helpText("Need a description..."),
         tags$hr(),
         tags$div(id = "boxplotGeneral",
           fluidRow(
@@ -179,10 +203,12 @@ dashboardPage(
         # tags$h4(class = "titre", "Hierarchical clustering"),
         # tags$hr(),
 
+        # DENDROGRAM
         tabsetPanel(
           tabPanel("Dendrogram",
             tags$i(class = "fa fa-sitemap fa-5x"),
             tags$h4(class = "titre", "Dendrogram"),
+            helpText("Need a description..."),
             tags$hr(),
             tags$div(class = "centeredInput", 
               numericInput("nbClusters", "Number of clusters", min = 1, max = nrow(libs), value = 1, step = 1)
@@ -207,10 +233,18 @@ dashboardPage(
               )#box Nodes height
             # )#fluidRow
           ),#tabPanel Dendrogram
+          
+          # HEATMAP
           tabPanel("Heatmap",
             tags$i(class = "fa fa-th-large fa-5x"),
             tags$h4(class = "titre", "Heatmap"),
-            tags$hr()
+            helpText("Need a description..."),
+            tags$hr(),
+            box(title = "Heatmap", solidHeader = T, collapsible = T, status = "primary", width = "950px", height = "950px",
+                fluidRow(column(1, actionButton("updateHeatmap", "Update heatmap"))),
+                tags$br(),
+                plotOutput("heatmapGenes", width = "950px", height = "750px")
+            )#box Heatmap
           )#tabPanel Heatmap
         )#tabsetPanel
 
@@ -221,6 +255,7 @@ dashboardPage(
       tabItem(tabName = "k-means",
         tags$i(class = "fa fa-dot-circle-o fa-5x"),
         tags$h4(class = "titre", "K-means"),
+        helpText("Need a description..."),
         tags$hr(),
         helpText("Nothing more here !")
       ),#tabItem k-means
@@ -230,6 +265,7 @@ dashboardPage(
       tabItem(tabName = "PCA",
         tags$i(class = "fa fa-area-chart fa-5x"),
         tags$h4(class = "titre", "Principal Components Analysis"),
+        helpText("Need a description..."),
         tags$hr(),
         helpText("Nothing for now...")
       ),#tabItems PCA
@@ -239,6 +275,7 @@ dashboardPage(
       tabItem(tabName = "CA",
         tags$i(class = "fa fa-area-chart fa-5x"),
         tags$h4(class = "titre", "Correspondence Analysis"),
+        helpText("Need a description..."),
         tags$hr(),
         helpText("Nothing more here !")
       ),#tabItems CA
@@ -248,6 +285,7 @@ dashboardPage(
       tabItem(tabName = "export",
         tags$i(class = "fa fa-share-square-o fa-5x"),
         tags$h4(class = "titre", "Export"),
+        helpText("Need a description..."),
         tags$hr(),
         helpText("Nothing for now...")
       )#tabItems export

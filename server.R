@@ -367,14 +367,31 @@ shinyServer(function(input, output, session) {
       incProgress(1/3, detail = "collecting dendrogram")
       genesDend <- genesDend() 
       genesDendRev <- rev(genesDend$height)
-      incProgress(1/3, detail = "drawing plot")
+      incProgress(2/3, detail = "drawing plot")
       plot(genesDendRev[1:input$heightlength], pch = 20, ylab = "Clusters height")
-      abline(v = input$nbClusters + 0.5, col = "grey60", lty = 2)
+      abline(v = input$nbClusters + 0.5, col = "red", lty = 2)
       for(i in genesDendRev){abline(h = i, lty= 2, col = "grey")}
     })
   })
   output$height <- renderPlot({
     contentheight()
+  })
+  
+  # HEATMAP
+  # =======
+  
+  contentheatmapGenes <- eventReactive(input$updateHeatmap, {
+    withProgress(message = 'heatmap', value = 0, {
+      incProgress(1/2, detail = "construction")
+      sublibs <- sublibs()
+      
+      NMF::aheatmap(corMat(),
+                    annCol=list(Run=sublibs$Run, Group=sublibs$group),
+                    Rowv = genesDend2(), Colv = genesDend2())
+    })
+  })
+  output$heatmapGenes <- renderPlot({
+    contentheatmapGenes()
   })
   
 })
