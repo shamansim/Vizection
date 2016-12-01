@@ -44,7 +44,10 @@ dashboardPage(
       ),#CA
 
       menuItem("Export", tabName = "export", icon = icon("share-square-o")
-      )#Export
+      ),#Export
+      
+      menuItem("About", tabName = "about", icon = icon("question-circle")
+      )#About
 
     )#sidebarMenu
     
@@ -288,7 +291,18 @@ dashboardPage(
         helpText("Need a description..."),
         tags$hr(),
         helpText("Nothing for now...")
-      )#tabItems export
+      ),#tabItems export
+      
+      # ABOUT
+      # =====
+      
+      tabItem(tabName = "about",
+              tags$i(class = "fa fa-question-circle fa-5x"),
+              tags$h4(class = "titre", "About"),
+              helpText("Need a description..."),
+              tags$hr(),
+              helpText("Nothing for now...")
+      )#tabItems about
 
     )#tabItems
     
