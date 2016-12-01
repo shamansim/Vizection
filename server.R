@@ -1,3 +1,4 @@
+# loading required library
 library(shiny)
 library(shinydashboard)
 library(ade4)
@@ -110,7 +111,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'Updating subgenes', {
       incProgress(1/3, detail = "filtering")
       pre_subgenes <- genes[, filterSelectionBoolFinal()]
-      incProgress(1/3, detail = "removing useless genes")
+      incProgress(2/3, detail = "removing useless genes")
       pre_subgenes[apply(pre_subgenes, 1, sum) != 0, ] #removing useless genes
     })
   })
@@ -136,7 +137,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'updating groups', {
       incProgress(1/3, detail = "extracting from filter")
       filterExtractedBool <- libs$counts > input$nbFilterExtracted
-      incProgress(1/3, detail = "creating checkbox")
+      incProgress(2/3, detail = "creating checkbox")
       myGroups <- addNumberOfSamples(paste(unique(libs$group[filterExtractedBool])))
       checkboxGroupInput(inputId = "groupsCheck", label = "",
         choices = myGroups,
@@ -170,7 +171,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'updating samples', {
       incProgress(1/3, detail = "extracting selection")
       filterSelectionNames <- rownames(libs)[filterSelectionBool()]
-      incProgress(1/3, detail = "creating checkbox")
+      incProgress(2/3, detail = "creating checkbox")
       mySamples <- addgroup(paste(filterSelectionNames))
       checkboxGroupInput(inputId = "samplesCheck", label = "",
         choices = mySamples,
@@ -189,9 +190,9 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'correlation matrice', {
       incProgress(1/4, detail = "TPM")
       a <- subgenes() %>% extract(-1, ) %>% TPM
-      incProgress(1/4, detail = "log1p")
+      incProgress(2/4, detail = "log1p")
       b <- a %>% log1p
-      incProgress(1/4, detail = "cor")
+      incProgress(3/4, detail = "cor")
       b %>% cor
     })
   })
@@ -203,7 +204,7 @@ shinyServer(function(input, output, session) {
         subtract(1, .) %>%
         divide_by(., 2) %>% 
         as.dist 
-      incProgress(1/3, detail = "quasieuclid")
+      incProgress(2/3, detail = "quasieuclid")
       a %>% quasieuclid
     })
   })
@@ -220,11 +221,11 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'dendrogram', {
       incProgress(1/6, detail = "nbGroups")
       nbGroups <- length(input$groupsCheck)
-      incProgress(1/6, detail = "colGroups")
+      incProgress(2/6, detail = "colGroups")
       colsGrps <- rainbow(nbGroups)
-      incProgress(1/6, detail = "colors")
+      incProgress(3/6, detail = "colors")
       cols <- rainbow_hcl(input$nbClusters, c=50, l=100)
-      incProgress(1/6, detail = "customization")
+      incProgress(4/6, detail = "customization")
       a <- genesDend() %>% as.dendrogram %>%
         set("branches_k_color", k = input$nbClusters, with = cols) %>%
         { 
@@ -233,7 +234,7 @@ shinyServer(function(input, output, session) {
             set(., "labels_colors", k = input$nbClusters, with = cols)
           )
         } 
-      incProgress(1/6, detail = "ladderize")
+      incProgress(5/6, detail = "ladderize")
       a %>% ladderize(FALSE)
     })
   })
@@ -242,7 +243,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'colors PCA', {
       incProgress(1/3, detail = "collecting nb clusters")
       ifelse(input$nbClusters!= 1, palette(rainbow_hcl(input$nbClusters, c=50, l=100)), palette(rainbow_hcl(2, c=50, l=100)))
-      incProgress(1/3, detail = "generating colors")
+      incProgress(2/3, detail = "generating colors")
       data.frame(colors = showDendrColors(genesDend2()), sampleIndex = order.dendrogram(genesDend2())) %>%
         setorder("sampleIndex") %$%
         return(colors)
@@ -256,9 +257,9 @@ shinyServer(function(input, output, session) {
       withProgress(message = 'Updating selection information', {
         incProgress(1/5, detail = "collecting sublibs")
         sublibs <- sublibs()
-        incProgress(1/5, detail = "collecting subgenes")
+        incProgress(2/5, detail = "collecting subgenes")
         subgenes <- subgenes()
-        incProgress(1/5, detail = "generating dataframe")
+        incProgress(3/5, detail = "generating dataframe")
         data <- data.frame(
           group = c("Samples", "Groups", "Genes"),
           value = c(sum(filterSelectionBoolFinal()) / nrow(libs) * 100,
@@ -267,7 +268,7 @@ shinyServer(function(input, output, session) {
           total = c(nrow(libs), length(unique(libs$group)), nrow(genes[-1,])),
           selection = c(sum(filterSelectionBoolFinal()), length(unique(sublibs$group)), nrow(subgenes[-1,]))
         )
-        incProgress(1/5, detail = "final process")
+        incProgress(4/5, detail = "final process")
         list(
           samples = data %>% filter(group == "Samples") %$% value %>% round(digits = 2),
           groups = data %>% filter(group == "Groups") %$% value %>% round(digits = 2),
@@ -315,7 +316,7 @@ shinyServer(function(input, output, session) {
       withProgress(message = 'Updating total boxplot', {
         incProgress(1/3, detail = "collecting sublibs")
         sublibs <- sublibs()
-        incProgress(1/3, detail = "generating")
+        incProgress(2/3, detail = "generating")
         ggplot(data = libs[libs$group == input$boxplotGroupsTotal, ], aes(input$boxplotGroupsTotal, counts)) +
           geom_boxplot() +
           xlab("") + ylab("") +
@@ -330,7 +331,7 @@ shinyServer(function(input, output, session) {
       withProgress(message = 'Updating sub boxplot', {
         incProgress(1/3, detail = "collecting sublibs")
         sublibs <- sublibs()
-        incProgress(1/3, detail = "generating")
+        incProgress(2/3, detail = "generating")
         ggplot(data = sublibs[sublibs$group == input$boxplotGroupsSub, ], aes(input$boxplotGroupsSub, counts)) +
           geom_boxplot() +
           xlab("") + ylab("") +
@@ -347,7 +348,7 @@ shinyServer(function(input, output, session) {
     withProgress(message = 'dendrogram plot', value = 0, {
       incProgress(1/3, detail = "modifying display parameters")
       par(mar = c(6,2,2,6))
-      incProgress(1/3, detail = "generating plot")
+      incProgress(2/3, detail = "generating plot")
       genesDend2() %>%
         dendextend::set("labels_cex", input$dendroSize) %>%
         plot(horiz = input$dendroHoriz)
