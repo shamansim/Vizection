@@ -1,0 +1,9 @@
+Package: vizection
+Title: Visualisation and dissection of single-cell transcriptomics big datasets
+Version: 0.9
+Authors@R: person("Simon", "Besson-Girard", email = "simon@besson-girard.fr", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+Depends: R (>= 3.3.2)
+License: What license is it under?
+LazyData: true
+RoxygenNote: 5.0.1.9000
