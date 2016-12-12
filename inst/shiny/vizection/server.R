@@ -13,6 +13,9 @@ library(dendextend)
 library(DT)
 library(plotly)
 
+genes <- get(getOption("vizection.genes"), .GlobalEnv)
+libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
+
 # In order to pipe ifelse
 ife <- function(cond, x, y) {
   if(cond) return(x) 

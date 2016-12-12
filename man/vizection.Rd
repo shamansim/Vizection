@@ -12,6 +12,13 @@ vizection(genes = genes, libs = libs, local = F)
 \description{
 This function launches the Vizection shiny application.
 }
+\details{
+By default, Vizection will look for two data frames called \dQuote{genes}
+and \dQuote{libs}.  Alternatively, these data frames can be passed as
+arguments to the \code{vizection()} function.  Their names will be used to
+update the global options (\code{vizection.genes} and \code{vizection.libs})
+that Vizection uses to find the objects in the global environment.
+}
 \examples{
 vizection(genes, libs, F)
 }
