@@ -31,7 +31,7 @@
 vizectionValidate<- function(genes, libs) {
   
   validateGenes <- function() {
-    assert_that(all(genes > 0))
+    assert_that(all(genes >= 0))
   }
   
   validateLibs <- function() {
