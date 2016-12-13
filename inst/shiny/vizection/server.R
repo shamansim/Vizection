@@ -11,7 +11,6 @@ library(colorspace)
 library(smallCAGEqc)
 library(dendextend)
 library(DT)
-library(plotly)
 
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
@@ -927,7 +926,7 @@ shinyServer(function(input, output, session) {
                  zaxis = list(title = "Axis3")))
     })
   })
-  output$pca3D <- renderPlotly({
+  output$pca3D <- plotly::renderPlotly({
     contentpca3D()
   })
   
@@ -1324,7 +1323,7 @@ shinyServer(function(input, output, session) {
           zaxis = list(title = "Axis3")))
     })
   })
-  output$coa3D <- renderPlotly({
+  output$coa3D <- plotly::renderPlotly({
     contentcoa3D()
   })
   

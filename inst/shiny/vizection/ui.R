@@ -11,7 +11,6 @@ library(colorspace)
 library(smallCAGEqc)
 library(dendextend)
 library(DT)
-library(plotly)
 
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
@@ -353,7 +352,7 @@ dashboardPage(
                      tabPanel("3D",
                               sliderInput("pca3ddotsize", "Dot size: ", min = 1, max = 20, step = 1, value = 2),
                               actionButton("generatepca3d", "Update plot"),
-                              plotlyOutput("pca3D", width = "950px", height = "750px")
+                              plotly::plotlyOutput("pca3D", width = "950px", height = "750px")
                      )#3D
                    )#tabsetPanel Plots
           ),#tabsetPanel Plots
@@ -429,7 +428,7 @@ dashboardPage(
                      tabPanel("3D",
                               sliderInput("coa3ddotsize", "Dot size: ", min = 1, max = 20, step = 1, value = 2),
                               actionButton("generatecoa3d", "Update plot"),
-                              plotlyOutput("coa3D", width = "950px", height = "750px")
+                              plotly::plotlyOutput("coa3D", width = "950px", height = "750px")
                      )#3D
                    )#tabsetPanel
           )#Plots
