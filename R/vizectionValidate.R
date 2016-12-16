@@ -37,6 +37,7 @@ vizectionValidate<- function(genes, libs) {
   validateLibs <- function() {
     assert_that("counts" %in% colnames(libs))
     assert_that("group" %in% colnames(libs))
+    assert_that(is.factor(libs$group))
     assert_that("samplename" %in% colnames(libs))
   }
   
