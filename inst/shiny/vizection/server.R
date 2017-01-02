@@ -16,6 +16,8 @@ library(plotly)
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
 
+vizectionValidate(genes = genes, libs = libs)
+
 # In order to pipe ifelse
 ife <- function(cond, x, y) {
   if(cond) return(x) 
