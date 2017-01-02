@@ -10,7 +10,7 @@
 #' 
 #' @param local T if you want host to be "0.0.0.0"
 #' @import DT ade4 adegraphics colorspace data.table dendextend dplyr ggplot2
-#'   magrittr plotly shiny shinydashboard smallCAGEqc
+#'   magrittr shiny shinydashboard smallCAGEqc
 #' @export
 #' @examples
 #' vizection(genes, libs, F)
