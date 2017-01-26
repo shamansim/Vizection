@@ -7,14 +7,28 @@ Developped during my 6 month internship at RIKEN CLST in the Division of Genomic
 
 Install from GitHub with:
 
-    devtools::install_github("shamansim/Vizection", upgrade_dependencies = FALSE)) # Note the capital 'V'.
+    devtools::install_github("shamansim/Vizection", upgrade_dependencies = FALSE) # Note the capital 'V'.
 
 Load the library:
 
     library(vizection) # Note the lowercase 'v'
+    
+If you do not have any dataset you can generate some:
 
-Start vizection
+```
+data(iris)
+genes <- iris[, 1:4]
+libs <- as.data.frame(iris[, "Species"])
+colnames(libs) <- c('group')
+libs$samplename <- as.character(1:nrow(genes))
+rownames(libs) <- libs$samplename 
+libs$counts <- rnorm(n = nrow(genes), mean = 1000, sd = 200)
+genes <- as.data.frame(t(genes))
 
-    vizection(genes = genes, libs = libs, local = TRUE) # local = TRUE implies host="0.0.0.0" #pas de majuscule
+```
 
-Documentation is under way, please be patient :)
+Start vizection:
+
+    vizection(genes = genes, libs = libs, local = FALSE) # local = TRUE implies host="0.0.0.0" 
+
+Documentation is under way, some features are still not working properly, please be patient :)
