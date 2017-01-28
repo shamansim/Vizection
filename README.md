@@ -1,7 +1,7 @@
 # Vizection
- Shiny application for single cell transcriptomics studies data visualisation / exploration and quality control
+ Shiny application for single cell transcriptomics studies data visualisation / exploration, quality control and analysis
 
-Developped during my 6 month internship at RIKEN CLST in the Division of Genomics Technologies (DGT) in the Genomics Miniaturization Technology Unit. I was supervised by [Charles Plessy](https://github.com/charles-plessy).
+Developped during my 6 month internship at RIKEN Center for the Life Science Technologies (CLST) in the Division of Genomics Technologies (DGT) in the Genomics Miniaturization Technology Unit. I was supervised by [Charles Plessy](https://github.com/charles-plessy).
 
 ## How to install and use
 
