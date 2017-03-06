@@ -78,34 +78,18 @@ shinyServer(function(input, output, session) {
   # FILTERS
   # =======
   
-  UNaddNumberOfSamplesOrGroup <- function(Checklist){
-    result <- c()
-    for(i in Checklist){
-      result <- c(result, i %>% sapply(., function(x) gsub("\\s[:|:]\\s.*", "", x)))
-    }
-    return(result)
-  }
-  
-  contentfilterSelectionBool <- reactive({
+  filterSelectionBool <- reactive({
     withProgress(message = 'Updating pre-filter', {
       incProgress(1/2, detail = "updating")
-      (libs$counts > input$nbFilterExtracted) &
-        (rownames(libs) %in% (libs %>% select(samplename, group) %>% filter(group %in% UNaddNumberOfSamplesOrGroup(input$groupsCheck)) %$% samplename))
+      vizection:::filterSelectionBool(input)
     })
-  })
-  filterSelectionBool <- reactive({
-    contentfilterSelectionBool()
   })
 
-  contentfilterSelectionBoolFinal <- reactive({
+  filterSelectionBoolFinal <- reactive({
     withProgress(message = 'Updating filter', {
       incProgress(1/2, detail = "updating")
-      filterSelectionBool() &
-        (libs$samplename %in% UNaddNumberOfSamplesOrGroup(paste(input$samplesCheck)))
+      vizection:::filterSelectionBoolFinal(input)
     })
-  })
-  filterSelectionBoolFinal <- reactive({
-    contentfilterSelectionBoolFinal()
   })
   
   # SUBGENES SUBLIBS
