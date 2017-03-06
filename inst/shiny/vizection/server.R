@@ -98,48 +98,41 @@ shinyServer(function(input, output, session) {
   subgenes <- reactive({
     withProgress(message = 'Updating subgenes', {
       incProgress(1/3, detail = "filtering")
-      pre_subgenes <- genes[, filterSelectionBoolFinal()]
+      pre_subgenes <- vizection:::subgenes_1(genes, input)
       incProgress(2/3, detail = "removing useless genes")
-      pre_subgenes[apply(pre_subgenes, 1, sum) != 0, ] #removing useless genes
+      vizection:::subgenes_2(pre_subgenes) #removing useless genes
     })
   })
 
   sublibs <- reactive({
     withProgress(message = 'Updating sublibs', {
       incProgress(1/2, detail = "filtering")
-      sublibs0 <- libs[filterSelectionBoolFinal(), ]
-      sublibs0$group %<>% extract(drop = T)
-      sublibs0
+      vizection:::sublibs(input)
     })
   })
   
   # -> libsGroup
-  addNumberOfSamples <- function(listOfGroups){
-    result <- c()
-    for(i in listOfGroups){
-      result <- c(result, paste0(i, " | ", libs$samplename[libs$group==i] %>% length))
-    }
-    return(result)
-  }
+  
   contentlibsGroup <- reactive({
     withProgress(message = 'updating groups', {
       incProgress(1/3, detail = "extracting from filter")
       filterExtractedBool <- libs$counts > input$nbFilterExtracted
       incProgress(2/3, detail = "creating checkbox")
-      myGroups <- addNumberOfSamples(paste(unique(libs$group[filterExtractedBool])))
+      myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
       checkboxGroupInput(inputId = "groupsCheck", label = "",
         choices = myGroups,
         selected = myGroups
       )
     })
   })
+  
   output$libsGroup <- renderUI({
     contentlibsGroup()
   })
 
   observe({
     filterExtractedBool <- libs$counts > input$nbFilterExtracted
-    myGroups <- addNumberOfSamples(paste(unique(libs$group[filterExtractedBool])))
+    myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
     updateCheckboxGroupInput(session,
       "groupsCheck",
       choices = myGroups,
