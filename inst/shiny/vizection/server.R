@@ -116,7 +116,7 @@ shinyServer(function(input, output, session) {
   contentlibsGroup <- reactive({
     withProgress(message = 'updating groups', {
       incProgress(1/3, detail = "extracting from filter")
-      filterExtractedBool <- libs$counts > input$nbFilterExtracted
+      filterExtractedBool <- vizection:::filterExtractedBool(libs, input)
       incProgress(2/3, detail = "creating checkbox")
       myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
       checkboxGroupInput(inputId = "groupsCheck", label = "",
@@ -131,7 +131,7 @@ shinyServer(function(input, output, session) {
   })
 
   observe({
-    filterExtractedBool <- libs$counts > input$nbFilterExtracted
+    filterExtractedBool <- vizection:::filterExtractedBool(libs, input)
     myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
     updateCheckboxGroupInput(session,
       "groupsCheck",
@@ -141,19 +141,13 @@ shinyServer(function(input, output, session) {
   })
   
   # -> libsSamplename
-  addgroup <- function(listOfSamples){
-    result = c()
-    for(i in listOfSamples){
-      result <- c(result, paste0(i, " | ", libs$group[libs$samplename==i]))
-    }
-    return(result)
-  }
+  
   contentlibsSamplename <- eventReactive(input$updateSamples, {
     withProgress(message = 'updating samples', {
       incProgress(1/3, detail = "extracting selection")
       filterSelectionNames <- rownames(libs)[filterSelectionBool()]
       incProgress(2/3, detail = "creating checkbox")
-      mySamples <- addgroup(paste(filterSelectionNames))
+      mySamples <- vizection:::addGroupName(libs, paste(filterSelectionNames))
       checkboxGroupInput(inputId = "samplesCheck", label = "",
         choices = mySamples,
         selected = mySamples

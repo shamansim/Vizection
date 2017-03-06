@@ -26,6 +26,11 @@ filterSelectionBoolFinal <- function(input) {
        UNaddNumberOfSamplesOrGroup(paste(input$samplesCheck)))
 }
 
+#' filterExtractedBool
+
+filterExtractedBool <- function(libs, input)
+  libs$counts > input$nbFilterExtracted
+
 #' subgenes
 
 subgenes_1 <- function(input, genes)
@@ -61,4 +66,20 @@ addNumberOfSamples <- function(libs, groups){
                        , " | "
                        , libs$samplename[libs$group==i] %>% length))}
   result
+}
+
+#' addGroupName
+#' 
+#' Displays something like "samplename | groupname".
+#' 
+#' Takes a vector of sample names name and constructs a vector of
+#' strings made of the sample name, a pipe separator and the name
+#' of its group.
+
+addGroupName <- function(libs, samples){
+  result = c()
+  for(i in samples){
+    result <- c(result, paste0(i, " | ", libs$group[libs$samplename==i]))
+  }
+  return(result)
 }
