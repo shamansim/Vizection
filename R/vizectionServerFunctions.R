@@ -8,7 +8,7 @@ UNaddNumberOfSamplesOrGroup <- function(Checklist){
 
 #' filterSelectionBool
 
-filterSelectionBool <- function(input) {
+filterSelectionBool <- function(libs, input) {
   filterByCounts <- libs$counts > input$nbFilterExtracted
   filterByGroup  <- rownames(libs) %in% (
     libs %>%
@@ -20,8 +20,8 @@ filterSelectionBool <- function(input) {
 
 #' filterSelectionBoolFinal
 
-filterSelectionBoolFinal <- function(input) {
-  filterSelectionBool(input) &
+filterSelectionBoolFinal <- function(libs, input) {
+  filterSelectionBool(libs, input) &
     (libs$samplename %in%
        UNaddNumberOfSamplesOrGroup(paste(input$samplesCheck)))
 }

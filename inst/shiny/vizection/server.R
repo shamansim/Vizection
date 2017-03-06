@@ -81,14 +81,14 @@ shinyServer(function(input, output, session) {
   filterSelectionBool <- reactive({
     withProgress(message = 'Updating pre-filter', {
       incProgress(1/2, detail = "updating")
-      vizection:::filterSelectionBool(input)
+      vizection:::filterSelectionBool(libs, input)
     })
   })
 
   filterSelectionBoolFinal <- reactive({
     withProgress(message = 'Updating filter', {
       incProgress(1/2, detail = "updating")
-      vizection:::filterSelectionBoolFinal(input)
+      vizection:::filterSelectionBoolFinal(libs, input)
     })
   })
   
