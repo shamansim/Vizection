@@ -98,7 +98,7 @@ shinyServer(function(input, output, session) {
   subgenes <- reactive({
     withProgress(message = 'Updating subgenes', {
       incProgress(1/3, detail = "filtering")
-      pre_subgenes <- vizection:::subgenes_1(genes, input)
+      pre_subgenes <- vizection:::subgenes_1(libs, input, genes)
       incProgress(2/3, detail = "removing useless genes")
       vizection:::subgenes_2(pre_subgenes) #removing useless genes
     })
@@ -107,7 +107,7 @@ shinyServer(function(input, output, session) {
   sublibs <- reactive({
     withProgress(message = 'Updating sublibs', {
       incProgress(1/2, detail = "filtering")
-      vizection:::sublibs(input)
+      vizection:::sublibs(libs, input)
     })
   })
   

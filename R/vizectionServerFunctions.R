@@ -1,12 +1,30 @@
-UNaddNumberOfSamplesOrGroup <- function(Checklist){
-  result <- c()
-  for(i in Checklist){
-    result <- c(result, i %>% sapply(., function(x) gsub("\\s[:|:]\\s.*", "", x)))
-  }
-  return(result)
+#' vizectionExampleLibs
+#' 
+#' Toy example for the "libs" table to be used in vizection.
+#' 
+#' This is for debuggint purposes; the example does not reflect well
+#' the kind of real datat that is expected.
+#' 
+#' @example 
+#' summary(vizectionExampleLibs())
+#' head(vizectionExampleLibs())
+
+vizectionExampleLibs <- function() {
+  data(iris)
+  genes <- iris[, 1:4]
+  libs <- as.data.frame(iris[, "Species"])
+  colnames(libs) <- c('group')
+  libs$samplename <- as.character(1:nrow(genes))
+  rownames(libs) <- libs$samplename 
+  libs$counts <- rnorm(n = nrow(genes), mean = 1000, sd = 200)
+  libs
 }
 
 #' filterSelectionBool
+#' 
+#' @example 
+#' x <- list(nbFilterExtracted = 0, groupsCheck = c("setosa | 5", "virginica | 10"))
+#' filterSelectionBool(libs = vizectionExampleLibs(), input = x)
 
 filterSelectionBool <- function(libs, input) {
   filterByCounts <- libs$counts > input$nbFilterExtracted
@@ -19,11 +37,17 @@ filterSelectionBool <- function(libs, input) {
 }
 
 #' filterSelectionBoolFinal
+#' 
+#' @example 
+#' x <- list( nbFilterExtracted = 0
+#'          , groupsCheck = c("setosa | 5", "virginica | 10")
+#'          , samplesCheck = c("1 | setosa", "150 | virginica"))
+#' filterSelectionBoolFinal(libs = vizectionExampleLibs(), input = x)
 
 filterSelectionBoolFinal <- function(libs, input) {
   filterSelectionBool(libs, input) &
     (libs$samplename %in%
-       UNaddNumberOfSamplesOrGroup(paste(input$samplesCheck)))
+       UNaddNumberOfSamplesOrGroup(input$samplesCheck))
 }
 
 #' filterExtractedBool
@@ -33,19 +57,19 @@ filterExtractedBool <- function(libs, input)
 
 #' subgenes
 
-subgenes_1 <- function(input, genes)
-  genes[, filterSelectionBoolFinal(input)]
+subgenes_1 <- function(libs, input, genes)
+  genes[, filterSelectionBoolFinal(libs, input)]
 
 subgenes_2 <- function(pre_subgenes)
   pre_subgenes[apply(pre_subgenes, 1, sum) != 0, ] # removing useless genes
 
-subgenes <- function(input, genes)
+subgenes <- function(libs, input, genes)
   subgenes_1 %>% subgenes_2
 
 #' sublibs
 
-sublibs <- function(input) {
-  sublibs0 <- libs[filterSelectionBoolFinal(input), ]
+sublibs <- function(libs, input) {
+  sublibs0 <- libs[filterSelectionBoolFinal(libs, input), ]
   sublibs0$group %<>% extract(drop = T)
   sublibs0
 }
@@ -83,3 +107,17 @@ addGroupName <- function(libs, samples){
   }
   return(result)
 }
+
+#' UNaddNumberOfSamplesOrGroup
+#'
+#' Same as above except that it does not keep name attributes.
+#'
+#' @param names Group or sample names to which other information
+#'              have been added by the functions addGroupName or
+#'              addNumberOfSamples.
+#'
+#' @example 
+#' c("toto | 5", "H12 | toto") %>% UNaddNumberOfSamplesOrGroup
+
+UNaddNumberOfSamplesOrGroup <- function(names)
+  gsub("\\s[:|:]\\s.*", "", names)
