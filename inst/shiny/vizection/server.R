@@ -467,9 +467,9 @@ shinyServer(function(input, output, session) {
   contentgenesPCA <- eventReactive(input$updatePCASummary, {
     withProgress(message = 'PCA summary', {
       incProgress(1/3, detail = "TPM")
-      genesTpm <- subgenes() %>% smallCAGEqc::TPM() %>% t
+      genesTpm <- subgenes() %>% vizection:::contentgenesPCA_1()
       incProgress(2/3, detail = "dudi.pca")
-      dudi.pca(genesTpm[, -1], center = T, scale = F, scannf = F, nf = 3)
+      genesTpm %>% vizection:::contentgenesPCA_2()
     })
   })
   genesPca <- reactive({
