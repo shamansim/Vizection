@@ -8,7 +8,6 @@ library(dplyr)
 library(ggplot2)
 library(data.table)
 library(colorspace)
-library(smallCAGEqc)
 library(dendextend)
 library(DT)
 
@@ -164,9 +163,9 @@ shinyServer(function(input, output, session) {
   corMat <- eventReactive(input$updateCorMat, {
     withProgress(message = 'correlation matrice', {
       incProgress(1/4, detail = "TPM")
-      a <- subgenes() %>% corMat_1
+      a <- subgenes() %>% vizection:::corMat_1()
       incProgress(2/4, detail = "log1p")
-      b <- a %>% corMat_2
+      b <- a %>% vizection:::corMat_2()
       incProgress(3/4, detail = "cor")
       b %>% corMat_3
     })
@@ -175,12 +174,9 @@ shinyServer(function(input, output, session) {
   distCorMat <- reactive({
     withProgress(message = 'distance matrice', value = 0, {
       incProgress(1/3, detail = "as.dist")
-      a <- corMat() %>%
-        subtract(1, .) %>%
-        divide_by(., 2) %>% 
-        as.dist 
+      a <- corMat() %>% vizection:::distCorMat_1()
       incProgress(2/3, detail = "quasieuclid")
-      a %>% quasieuclid
+      a %>% vizection:::distCorMat_2()
     })
   })
   
@@ -485,7 +481,7 @@ shinyServer(function(input, output, session) {
   contentgenesPCA <- eventReactive(input$updatePCASummary, {
     withProgress(message = 'PCA summary', {
       incProgress(1/3, detail = "TPM")
-      genesTpm <- subgenes() %>% TPM %>% t
+      genesTpm <- subgenes() %>% smallCAGEqc::TPM() %>% t
       incProgress(2/3, detail = "dudi.pca")
       dudi.pca(genesTpm[, -1], center = T, scale = F, scannf = F, nf = 3)
     })
