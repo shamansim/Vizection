@@ -2,8 +2,8 @@
 #' 
 #' Toy example for the "libs" table to be used in vizection.
 #' 
-#' This is for debuggint purposes; the example does not reflect well
-#' the kind of real datat that is expected.
+#' This is for debugging purposes; the example does not reflect well
+#' the kind of real data that is expected.
 #' 
 #' @example 
 #' summary(vizectionExampleLibs())
@@ -20,11 +20,25 @@ vizectionExampleLibs <- function() {
   libs
 }
 
+#' vizectionExampleEnv
+#' 
+#' Toy example of "input" object passed by Shiny
+#' 
+#' This is for debugging purposes; the example does not reflect well
+#' the kind of real data that is expected.
+
+vizectionExampleEnv <- function()
+  list( nbFilterExtracted = 0
+      , nbClusters        = 3
+      , showGroupsColor   = TRUE
+      , groupsCheck       = c("setosa | 5", "virginica | 10")
+      , samplesCheck      = c("1 | setosa", "150 | virginica"))
+
 #' filterSelectionBool
 #' 
 #' @example 
-#' x <- list(nbFilterExtracted = 0, groupsCheck = c("setosa | 5", "virginica | 10"))
-#' filterSelectionBool(libs = vizectionExampleLibs(), input = x)
+#' filterSelectionBool( libs = vizectionExampleLibs()
+#'                    , input = vizectionExampleEnv())
 
 filterSelectionBool <- function(libs, input) {
   filterByCounts <- libs$counts > input$nbFilterExtracted
@@ -39,10 +53,8 @@ filterSelectionBool <- function(libs, input) {
 #' filterSelectionBoolFinal
 #' 
 #' @example 
-#' x <- list( nbFilterExtracted = 0
-#'          , groupsCheck = c("setosa | 5", "virginica | 10")
-#'          , samplesCheck = c("1 | setosa", "150 | virginica"))
-#' filterSelectionBoolFinal(libs = vizectionExampleLibs(), input = x)
+#' filterSelectionBoolFinal( libs  = vizectionExampleLibs()
+#'                         , input = vizectionExampleEnv())
 
 filterSelectionBoolFinal <- function(libs, input) {
   filterSelectionBool(libs, input) &

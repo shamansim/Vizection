@@ -7,20 +7,12 @@ library(magrittr)
 library(dplyr)
 library(ggplot2)
 library(data.table)
-library(colorspace)
-library(dendextend)
 library(DT)
 
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
 
 vizectionValidate(genes = genes, libs = libs)
-
-# In order to pipe ifelse
-ife <- function(cond, x, y) {
-  if(cond) return(x) 
-  else return(y)
-}
 
 showDendrColors <- function(dendro){
   dendrapply(dendro, function(X){
@@ -161,7 +153,7 @@ shinyServer(function(input, output, session) {
   # ======
   
   corMat <- eventReactive(input$updateCorMat, {
-    withProgress(message = 'correlation matrice', {
+    withProgress(message = 'correlation matrix', {
       incProgress(1/4, detail = "TPM")
       a <- subgenes() %>% vizection:::corMat_1()
       incProgress(2/4, detail = "log1p")
@@ -172,7 +164,7 @@ shinyServer(function(input, output, session) {
   })
   
   distCorMat <- reactive({
-    withProgress(message = 'distance matrice', value = 0, {
+    withProgress(message = 'distance matrix', value = 0, {
       incProgress(1/3, detail = "as.dist")
       a <- corMat() %>% vizection:::distCorMat_1()
       incProgress(2/3, detail = "quasieuclid")
@@ -183,30 +175,26 @@ shinyServer(function(input, output, session) {
   genesDend <- reactive({
     withProgress(message = 'cluster', value = 0, {
       incProgress(1/2, detail = "hclust")
-      distCorMat() %>%
-        hclust(method = "complete")
+      distCorMat() %>% vizection:::genesDend()
     })
   })
   
   genesDend2 <- reactive({
     withProgress(message = 'dendrogram', {
       incProgress(1/6, detail = "nbGroups")
-      nbGroups <- length(input$groupsCheck)
+      nbGroups <- vizection:::genesDend2_1(input)
       incProgress(2/6, detail = "colGroups")
-      colsGrps <- rainbow(nbGroups)
+      colsGrps <- vizection:::genesDend2_2(nbGroups)
       incProgress(3/6, detail = "colors")
-      cols <- rainbow_hcl(input$nbClusters, c=50, l=100)
+      cols <- vizection:::genesDend2_3(input)
       incProgress(4/6, detail = "customization")
-      a <- genesDend() %>% as.dendrogram %>%
-        set("branches_k_color", k = input$nbClusters, with = cols) %>%
-        { 
-          ife(input$showGroupsColor ,
-            set(., "labels_colors", k = nbGroups, with = colsGrps),
-            set(., "labels_colors", k = input$nbClusters, with = cols)
-          )
-        } 
+      a <- genesDend() %>%
+             vizection:::genesDend2_4( input
+                                     , nbGroups = nbGroups
+                                     , colsGrps = colsGrps
+                                     , cols     = cols)
       incProgress(5/6, detail = "ladderize")
-      a %>% ladderize(FALSE)
+      a %>% vizection:::genesDend2_5()
     })
   })
   
