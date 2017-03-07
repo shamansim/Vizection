@@ -159,7 +159,7 @@ shinyServer(function(input, output, session) {
       incProgress(2/4, detail = "log1p")
       b <- a %>% vizection:::corMat_2()
       incProgress(3/4, detail = "cor")
-      b %>% corMat_3
+      b %>% vizection:::corMat_3()
     })
   })
   
@@ -342,11 +342,9 @@ shinyServer(function(input, output, session) {
   contentheatmapGenes <- eventReactive(input$updateHeatmap, {
     withProgress(message = 'heatmap', value = 0, {
       incProgress(1/2, detail = "construction")
-      sublibs <- sublibs()
-      
-      NMF::aheatmap(corMat(),
-                    annCol=list(Run=sublibs$Run, Group=sublibs$group),
-                    Rowv = genesDend2(), Colv = genesDend2())
+      vizection:::contentheatmapGenes( cormat  = corMat()
+                                     , dendr   = genesDend2()
+                                     , sublibs = sublibs())
     })
   })
   output$heatmapGenes <- renderPlot({

@@ -114,3 +114,22 @@ genesDend2 <- function(d, x)
               , colGrps = genesDend2_2(genesDend2_1(x))
               , cols = genesDend2_3(x)) %>%
     genesDend2_5()
+
+#' contentheatmapGenes
+#' 
+#' Plots Vizection's heatmap of correlations.
+#' 
+#' @param cormat A correlation matrix like the output of corMat().
+#' @param dendr A dendrogram object like the ouptut of gendsDend2().
+#' @param sublibs A "libs" table like the output of vizectionExampleLibs().
+#' 
+#' @example
+#' cormat <- vizectionExampleGenes() %>% corMat
+#' dendr <- cormat %>% distCorMat %>% genesDend %>% genesDend2(x = vizectionExampleEnv())
+#' contentheatmapGenes(cormat, dendr, vizectionExampleLibs())
+
+contentheatmapGenes <- function(cormat, dendr, sublibs)
+  NMF::aheatmap( cormat
+               , annCol = list(Run=sublibs$Run, Group=sublibs$group)
+               , Rowv   = dendr
+               , Colv   = dendr)

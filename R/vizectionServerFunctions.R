@@ -17,7 +17,25 @@ vizectionExampleLibs <- function() {
   libs$samplename <- as.character(1:nrow(genes))
   rownames(libs) <- libs$samplename 
   libs$counts <- rnorm(n = nrow(genes), mean = 1000, sd = 200)
+  libs$Run <- "Run1" %>% factor
   libs
+}
+
+#' vizectionExampleGenes
+#' 
+#' Toy example for the "genes" table to be used in vizection.
+#' 
+#' This is for debugging purposes; the example does not reflect well
+#' the kind of real data that is expected.
+#' 
+#' @example 
+#' summary(vizectionExampleGenes())
+#' head(vizectionExampleGenes())
+
+vizectionExampleGenes <- function() {
+  data(iris)
+  genes <- iris[, 1:4]
+  genes <- as.data.frame(t(genes))
 }
 
 #' vizectionExampleEnv
