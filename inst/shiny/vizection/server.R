@@ -22,48 +22,6 @@ showDendrColors <- function(dendro){
   }) %>% unlist
 }
 
-pcaCompOrientation <- function(compPca){
-  ifelse(abs(range(compPca)[1]) > abs(range(compPca)[2]), FALSE, TRUE)
-}
-
-pcaCompGenesList <- function(pcaAde4co, comp){
-  stopifnot(ncol(pcaAde4co) == 3)
-  
-  genesCo <- pcaAde4co %>%
-    mutate(., geneNames = rownames(.)) %>% 
-    select(geneNames, Comp1, Comp2, Comp3)
-  
-  ifelse(pcaCompOrientation(genesCo[comp+1]),
-    genesCo %<>% setorderv(., colnames(.)[comp+1], order=-1),
-    genesCo %<>% setorderv(., colnames(.)[comp+1], order=1))
-  
-  genesCo
-}
-
-plotHTB <- function(orderedCompPca, comp, nbDispGenes = 25){
-  par(mfrow=c(1, 2))
-  
-  bp1h <- orderedCompPca[, comp+1] %>% 
-    head(nbDispGenes) %>%
-    barplot(. ,
-      ylim = c(min(orderedCompPca[, comp+1]), max(orderedCompPca[, comp+1])),
-      axes = FALSE, axisnames = FALSE, main = paste0("comp ", comp, " head"))
-  text(bp1h, par("usr")[3], labels = orderedCompPca$geneNames %>% head(nbDispGenes),
-    srt = 90, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-  axis(2)
-  
-  bp1t <- orderedCompPca[, comp+1] %>%
-    tail(nbDispGenes) %>%
-    barplot(. ,
-      ylim = c(min(orderedCompPca[, comp+1]), max(orderedCompPca[, comp+1])),
-      axes = FALSE, axisnames = FALSE, main = paste0("comp ", comp, " tail"))
-  text(bp1t, par("usr")[3], labels = orderedCompPca$geneNames %>% tail(nbDispGenes),
-    srt = 90, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-  axis(4)
-  
-  par(mfrow=c(1, 1))
-}
-
 shinyServer(function(input, output, session) {
   
   # FILTERS
@@ -481,7 +439,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$eigenvalues <- renderPlot({
-    barplot(genesPca() %$% eig, xlab = "Eigenvalues")
+    genesPca() %>% vizection:::plotEigenValues()
   })
   
   #
@@ -490,9 +448,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp1 <- pcaCompGenesList(genesPca$co, 1)
+      genesCoComp1 <- vizection:::pcaCompGenesList(genesPca$co, 1)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp1, 1, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp1, 1, input$nbDispGenes)
     })
   })
   output$components1 <- renderPlot({
@@ -504,9 +462,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp2 <- pcaCompGenesList(genesPca$co, 2)
+      genesCoComp2 <- vizection:::pcaCompGenesList(genesPca$co, 2)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp2, 2, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp2, 2, input$nbDispGenes)
     })
   })
   output$components2 <- renderPlot({
@@ -518,9 +476,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp3 <- pcaCompGenesList(genesPca$co, 3)
+      genesCoComp3 <- vizection:::pcaCompGenesList(genesPca$co, 3)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp3, 3, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp3, 3, input$nbDispGenes)
     })
   })
   output$components3 <- renderPlot({

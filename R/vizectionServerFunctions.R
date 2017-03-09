@@ -48,6 +48,7 @@ vizectionExampleGenes <- function() {
 vizectionExampleEnv <- function()
   list( nbFilterExtracted = 0
       , nbClusters        = 3
+      , nbDispGenes       = 10
       , showGroupsColor   = TRUE
       , groupsCheck       = c("setosa | 5", "virginica | 10")
       , samplesCheck      = c("1 | setosa", "150 | virginica"))
