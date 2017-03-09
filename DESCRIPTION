@@ -1,7 +1,10 @@
 Package: vizection
 Title: Visualisation and dissection of single-cell transcriptomics big datasets
 Version: 0.9
-Authors@R: person("Simon", "Besson-Girard", email = "simon@besson-girard.fr", role = c("aut", "cre"))
+Authors@R: c(
+  person("Simon", "Besson-Girard", email = "simon@besson-girard.fr", role = c("aut", "cre")),
+  person("Charles", "Plessy", role = c("ctb", "ths"))
+  )
 Description: What the package does (one paragraph).
 Imports:
     DT,
