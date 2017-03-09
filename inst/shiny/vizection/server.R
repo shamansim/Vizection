@@ -7,21 +7,12 @@ library(magrittr)
 library(dplyr)
 library(ggplot2)
 library(data.table)
-library(colorspace)
-library(smallCAGEqc)
-library(dendextend)
 library(DT)
 
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
 
 vizectionValidate(genes = genes, libs = libs)
-
-# In order to pipe ifelse
-ife <- function(cond, x, y) {
-  if(cond) return(x) 
-  else return(y)
-}
 
 showDendrColors <- function(dendro){
   dendrapply(dendro, function(X){
@@ -31,81 +22,23 @@ showDendrColors <- function(dendro){
   }) %>% unlist
 }
 
-pcaCompOrientation <- function(compPca){
-  ifelse(abs(range(compPca)[1]) > abs(range(compPca)[2]), FALSE, TRUE)
-}
-
-pcaCompGenesList <- function(pcaAde4co, comp){
-  stopifnot(ncol(pcaAde4co) == 3)
-  
-  genesCo <- pcaAde4co %>%
-    mutate(., geneNames = rownames(.)) %>% 
-    select(geneNames, Comp1, Comp2, Comp3)
-  
-  ifelse(pcaCompOrientation(genesCo[comp+1]),
-    genesCo %<>% setorderv(., colnames(.)[comp+1], order=-1),
-    genesCo %<>% setorderv(., colnames(.)[comp+1], order=1))
-  
-  genesCo
-}
-
-plotHTB <- function(orderedCompPca, comp, nbDispGenes = 25){
-  par(mfrow=c(1, 2))
-  
-  bp1h <- orderedCompPca[, comp+1] %>% 
-    head(nbDispGenes) %>%
-    barplot(. ,
-      ylim = c(min(orderedCompPca[, comp+1]), max(orderedCompPca[, comp+1])),
-      axes = FALSE, axisnames = FALSE, main = paste0("comp ", comp, " head"))
-  text(bp1h, par("usr")[3], labels = orderedCompPca$geneNames %>% head(nbDispGenes),
-    srt = 90, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-  axis(2)
-  
-  bp1t <- orderedCompPca[, comp+1] %>%
-    tail(nbDispGenes) %>%
-    barplot(. ,
-      ylim = c(min(orderedCompPca[, comp+1]), max(orderedCompPca[, comp+1])),
-      axes = FALSE, axisnames = FALSE, main = paste0("comp ", comp, " tail"))
-  text(bp1t, par("usr")[3], labels = orderedCompPca$geneNames %>% tail(nbDispGenes),
-    srt = 90, adj = c(1.1,1.1), xpd = TRUE, cex=1)
-  axis(4)
-  
-  par(mfrow=c(1, 1))
-}
-
 shinyServer(function(input, output, session) {
   
   # FILTERS
   # =======
   
-  UNaddNumberOfSamplesOrGroup <- function(Checklist){
-    result <- c()
-    for(i in Checklist){
-      result <- c(result, i %>% sapply(., function(x) gsub("\\s[:|:]\\s.*", "", x)))
-    }
-    return(result)
-  }
-  
-  contentfilterSelectionBool <- reactive({
+  filterSelectionBool <- reactive({
     withProgress(message = 'Updating pre-filter', {
       incProgress(1/2, detail = "updating")
-      (libs$counts > input$nbFilterExtracted) &
-        (rownames(libs) %in% (libs %>% select(samplename, group) %>% filter(group %in% UNaddNumberOfSamplesOrGroup(input$groupsCheck)) %$% samplename))
+      vizection:::filterSelectionBool(libs, input)
     })
-  })
-  filterSelectionBool <- reactive({
-    contentfilterSelectionBool()
   })
 
-  contentfilterSelectionBoolFinal <- reactive({
+  filterSelectionBoolFinal <- reactive({
     withProgress(message = 'Updating filter', {
       incProgress(1/2, detail = "updating")
-      filterSelectionBool() &
-        (libs$samplename %in% UNaddNumberOfSamplesOrGroup(paste(input$samplesCheck)))
+      vizection:::filterSelectionBoolFinal(libs, input)
     })
-  })
-  filterSelectionBoolFinal <- reactive({
-    contentfilterSelectionBoolFinal()
   })
   
   # SUBGENES SUBLIBS
@@ -114,48 +47,41 @@ shinyServer(function(input, output, session) {
   subgenes <- reactive({
     withProgress(message = 'Updating subgenes', {
       incProgress(1/3, detail = "filtering")
-      pre_subgenes <- genes[, filterSelectionBoolFinal()]
+      pre_subgenes <- vizection:::subgenes_1(libs, input, genes)
       incProgress(2/3, detail = "removing useless genes")
-      pre_subgenes[apply(pre_subgenes, 1, sum) != 0, ] #removing useless genes
+      vizection:::subgenes_2(pre_subgenes) #removing useless genes
     })
   })
 
   sublibs <- reactive({
     withProgress(message = 'Updating sublibs', {
       incProgress(1/2, detail = "filtering")
-      sublibs0 <- libs[filterSelectionBoolFinal(), ]
-      sublibs0$group %<>% extract(drop = T)
-      sublibs0
+      vizection:::sublibs(libs, input)
     })
   })
   
   # -> libsGroup
-  addNumberOfSamples <- function(listOfGroups){
-    result <- c()
-    for(i in listOfGroups){
-      result <- c(result, paste0(i, " | ", libs$samplename[libs$group==i] %>% length))
-    }
-    return(result)
-  }
+  
   contentlibsGroup <- reactive({
     withProgress(message = 'updating groups', {
       incProgress(1/3, detail = "extracting from filter")
-      filterExtractedBool <- libs$counts > input$nbFilterExtracted
+      filterExtractedBool <- vizection:::filterExtractedBool(libs, input)
       incProgress(2/3, detail = "creating checkbox")
-      myGroups <- addNumberOfSamples(paste(unique(libs$group[filterExtractedBool])))
+      myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
       checkboxGroupInput(inputId = "groupsCheck", label = "",
         choices = myGroups,
         selected = myGroups
       )
     })
   })
+  
   output$libsGroup <- renderUI({
     contentlibsGroup()
   })
 
   observe({
-    filterExtractedBool <- libs$counts > input$nbFilterExtracted
-    myGroups <- addNumberOfSamples(paste(unique(libs$group[filterExtractedBool])))
+    filterExtractedBool <- vizection:::filterExtractedBool(libs, input)
+    myGroups <- vizection:::addNumberOfSamples(libs, paste(unique(libs$group[filterExtractedBool])))
     updateCheckboxGroupInput(session,
       "groupsCheck",
       choices = myGroups,
@@ -164,19 +90,13 @@ shinyServer(function(input, output, session) {
   })
   
   # -> libsSamplename
-  addgroup <- function(listOfSamples){
-    result = c()
-    for(i in listOfSamples){
-      result <- c(result, paste0(i, " | ", libs$group[libs$samplename==i]))
-    }
-    return(result)
-  }
+  
   contentlibsSamplename <- eventReactive(input$updateSamples, {
     withProgress(message = 'updating samples', {
       incProgress(1/3, detail = "extracting selection")
       filterSelectionNames <- rownames(libs)[filterSelectionBool()]
       incProgress(2/3, detail = "creating checkbox")
-      mySamples <- addgroup(paste(filterSelectionNames))
+      mySamples <- vizection:::addGroupName(libs, paste(filterSelectionNames))
       checkboxGroupInput(inputId = "samplesCheck", label = "",
         choices = mySamples,
         selected = mySamples
@@ -191,55 +111,48 @@ shinyServer(function(input, output, session) {
   # ======
   
   corMat <- eventReactive(input$updateCorMat, {
-    withProgress(message = 'correlation matrice', {
+    withProgress(message = 'correlation matrix', {
       incProgress(1/4, detail = "TPM")
-      a <- subgenes() %>% extract(-1, ) %>% TPM
+      a <- subgenes() %>% vizection:::corMat_1()
       incProgress(2/4, detail = "log1p")
-      b <- a %>% log1p
+      b <- a %>% vizection:::corMat_2()
       incProgress(3/4, detail = "cor")
-      b %>% cor
+      b %>% vizection:::corMat_3()
     })
   })
   
   distCorMat <- reactive({
-    withProgress(message = 'distance matrice', value = 0, {
+    withProgress(message = 'distance matrix', value = 0, {
       incProgress(1/3, detail = "as.dist")
-      a <- corMat() %>%
-        subtract(1, .) %>%
-        divide_by(., 2) %>% 
-        as.dist 
+      a <- corMat() %>% vizection:::distCorMat_1()
       incProgress(2/3, detail = "quasieuclid")
-      a %>% quasieuclid
+      a %>% vizection:::distCorMat_2()
     })
   })
   
   genesDend <- reactive({
     withProgress(message = 'cluster', value = 0, {
       incProgress(1/2, detail = "hclust")
-      distCorMat() %>%
-        hclust(method = "complete")
+      distCorMat() %>% vizection:::genesDend()
     })
   })
   
   genesDend2 <- reactive({
     withProgress(message = 'dendrogram', {
       incProgress(1/6, detail = "nbGroups")
-      nbGroups <- length(input$groupsCheck)
+      nbGroups <- vizection:::genesDend2_1(input)
       incProgress(2/6, detail = "colGroups")
-      colsGrps <- rainbow(nbGroups)
+      colsGrps <- vizection:::genesDend2_2(nbGroups)
       incProgress(3/6, detail = "colors")
-      cols <- rainbow_hcl(input$nbClusters, c=50, l=100)
+      cols <- vizection:::genesDend2_3(input)
       incProgress(4/6, detail = "customization")
-      a <- genesDend() %>% as.dendrogram %>%
-        set("branches_k_color", k = input$nbClusters, with = cols) %>%
-        { 
-          ife(input$showGroupsColor ,
-            set(., "labels_colors", k = nbGroups, with = colsGrps),
-            set(., "labels_colors", k = input$nbClusters, with = cols)
-          )
-        } 
+      a <- genesDend() %>%
+             vizection:::genesDend2_4( input
+                                     , nbGroups = nbGroups
+                                     , colsGrps = colsGrps
+                                     , cols     = cols)
       incProgress(5/6, detail = "ladderize")
-      a %>% ladderize(FALSE)
+      a %>% vizection:::genesDend2_5()
     })
   })
   
@@ -387,11 +300,9 @@ shinyServer(function(input, output, session) {
   contentheatmapGenes <- eventReactive(input$updateHeatmap, {
     withProgress(message = 'heatmap', value = 0, {
       incProgress(1/2, detail = "construction")
-      sublibs <- sublibs()
-      
-      NMF::aheatmap(corMat(),
-                    annCol=list(Run=sublibs$Run, Group=sublibs$group),
-                    Rowv = genesDend2(), Colv = genesDend2())
+      vizection:::contentheatmapGenes( cormat  = corMat()
+                                     , dendr   = genesDend2()
+                                     , sublibs = sublibs())
     })
   })
   output$heatmapGenes <- renderPlot({
@@ -514,9 +425,9 @@ shinyServer(function(input, output, session) {
   contentgenesPCA <- eventReactive(input$updatePCASummary, {
     withProgress(message = 'PCA summary', {
       incProgress(1/3, detail = "TPM")
-      genesTpm <- subgenes() %>% TPM %>% t
+      genesTpm <- subgenes() %>% vizection:::contentgenesPCA_1()
       incProgress(2/3, detail = "dudi.pca")
-      dudi.pca(genesTpm[, -1], center = T, scale = F, scannf = F, nf = 3)
+      genesTpm %>% vizection:::contentgenesPCA_2()
     })
   })
   genesPca <- reactive({
@@ -528,7 +439,7 @@ shinyServer(function(input, output, session) {
   })
   
   output$eigenvalues <- renderPlot({
-    barplot(genesPca() %$% eig, xlab = "Eigenvalues")
+    genesPca() %>% vizection:::plotEigenValues()
   })
   
   #
@@ -537,9 +448,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp1 <- pcaCompGenesList(genesPca$co, 1)
+      genesCoComp1 <- vizection:::pcaCompGenesList(genesPca$co, 1)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp1, 1, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp1, 1, input$nbDispGenes)
     })
   })
   output$components1 <- renderPlot({
@@ -551,9 +462,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp2 <- pcaCompGenesList(genesPca$co, 2)
+      genesCoComp2 <- vizection:::pcaCompGenesList(genesPca$co, 2)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp2, 2, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp2, 2, input$nbDispGenes)
     })
   })
   output$components2 <- renderPlot({
@@ -565,9 +476,9 @@ shinyServer(function(input, output, session) {
       incProgress(1/4, detail = "collecting PCA")
       genesPca <- genesPca()
       incProgress(2/4, detail = 'generating list')
-      genesCoComp3 <- pcaCompGenesList(genesPca$co, 3)
+      genesCoComp3 <- vizection:::pcaCompGenesList(genesPca$co, 3)
       incProgress(3/4, detail = 'generating plot')
-      plotHTB(genesCoComp3, 3, input$nbDispGenes)
+      vizection::plotHTB(genesCoComp3, 3, input$nbDispGenes)
     })
   })
   output$components3 <- renderPlot({
