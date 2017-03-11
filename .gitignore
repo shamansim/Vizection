@@ -4,3 +4,4 @@
 .Ruserdata
 vizection.R
 *.Rproj
+inst/doc
