@@ -7,7 +7,7 @@ vignette: >
   \usepackage[utf8]{inputenc}
 ---
 
-<img src="../inst/shiny/vizection/www/vizection.png" width="600">
+<img src="../inst/shiny/vizection/www/vizection.png" width="600" style="display: block; margin-left: auto; margin-right: auto;">
 
 By: **Simon Besson-Girard**
 
