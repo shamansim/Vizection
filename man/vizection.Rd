@@ -22,4 +22,3 @@ that Vizection uses to find the objects in the global environment.
 \examples{
 vizection(genes, libs, F)
 }
-

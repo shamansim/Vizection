@@ -33,4 +33,3 @@ colnames(igenes) <- rownames(ilibs)
 # Check that the format is valid (silently returns TRUE).
 vizectionValidate(genes=igenes, libs=ilibs)
 }
-
