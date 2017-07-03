@@ -829,7 +829,7 @@ shinyServer(function(input, output, session) {
       pcaColor <- pcaColor()
       pcaGroup <- pcaGroup()
       incProgress(3/4, detail = "creating 3D plot")
-      plot_ly(data = pcaGenesli, x = pcaGenesli$Axis1, y = pcaGenesli$Axis2, z = pcaGenesli$Axis3,
+      plotly::plot_ly(data = pcaGenesli, x = pcaGenesli$Axis1, y = pcaGenesli$Axis2, z = pcaGenesli$Axis3,
               type = "scatter3d", mode = "markers", marker = list(size = input$pca3ddotsize),
               color = pcaGroup, colors = pcaColor,
               text = sublibs()$samplename) %>% 
@@ -1226,7 +1226,7 @@ shinyServer(function(input, output, session) {
       coaColor <- coaColor()
       coaGroup <- coaGroup()
       incProgress(3/4, detail = "creating 3D plot")
-      plot_ly(data = coaGenesli, x = coaGenesli$Axis1, y = coaGenesli$Axis2, z = coaGenesli$Axis3,
+      plotly::plot_ly(data = coaGenesli, x = coaGenesli$Axis1, y = coaGenesli$Axis2, z = coaGenesli$Axis3,
               type = "scatter3d", mode = "markers", marker = list(size = input$coa3ddotsize),
               color = coaGroup, colors = coaColor,
               text = sublibs()$samplename)  %>% 
