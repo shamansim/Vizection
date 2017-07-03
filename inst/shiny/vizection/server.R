@@ -8,6 +8,7 @@ library(dplyr)
 library(ggplot2)
 library(data.table)
 library(DT)
+library(plotly)
 
 genes <- get(getOption("vizection.genes"), .GlobalEnv)
 libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
