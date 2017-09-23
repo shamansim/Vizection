@@ -1,5 +1,3 @@
-#' corMat
-#' 
 #' Calculate a correlation matrix.
 #' 
 #' @param genes An expression table of discrete counts
@@ -24,7 +22,7 @@ corMat_3 <- cor
 corMat <- function(genes)
   corMat_1(genes) %>% corMat_2 %>% corMat_3
 
-#' distCorMat
+#' Convert correlation to distance
 #' 
 #' Transforms a correlation matrix into a Euclidian distance matrix.
 #' 
@@ -48,7 +46,7 @@ distCorMat_2 <- ade4::quasieuclid
 distCorMat <- function(m)
   m %>% distCorMat_1 %>% distCorMat_2
 
-#' genesDend
+#' Complete hierarchical clustering
 #' 
 #' Cluster a distance matrix with the complete method.
 #' 
@@ -60,8 +58,7 @@ distCorMat <- function(m)
 genesDend <- function(d)
     d %>% hclust(method = "complete")
 
-#' genesDend2
-#' 
+
 #' Cluster a distance matrix with the complete method.
 #' 
 #' @param d a distance matrix
@@ -115,8 +112,7 @@ genesDend2 <- function(d, x)
               , cols = genesDend2_3(x)) %>%
     genesDend2_5()
 
-#' contentheatmapGenes
-#' 
+
 #' Plots Vizection's heatmap of correlations.
 #' 
 #' @param cormat A correlation matrix like the output of corMat().

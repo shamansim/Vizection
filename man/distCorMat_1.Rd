@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{distCorMat_1}
 \alias{distCorMat_1}
-\title{distCorMat}
+\title{Convert correlation to distance}
 \usage{
 distCorMat_1(m)
 }

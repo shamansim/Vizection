@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{genesDend2_1}
 \alias{genesDend2_1}
-\title{genesDend2}
+\title{Cluster a distance matrix with the complete method.}
 \usage{
 genesDend2_1(x)
 }

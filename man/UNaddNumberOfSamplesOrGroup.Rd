@@ -2,7 +2,7 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{UNaddNumberOfSamplesOrGroup}
 \alias{UNaddNumberOfSamplesOrGroup}
-\title{UNaddNumberOfSamplesOrGroup}
+\title{Clear sample or group names.}
 \usage{
 UNaddNumberOfSamplesOrGroup(names)
 }

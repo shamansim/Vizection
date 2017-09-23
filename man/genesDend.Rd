@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{genesDend}
 \alias{genesDend}
-\title{genesDend}
+\title{Complete hierarchical clustering}
 \usage{
 genesDend(d)
 }

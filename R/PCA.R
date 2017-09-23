@@ -1,5 +1,3 @@
-#' contentgenesPCA
-#' 
 #' Vizection's Principal Component Analysis
 #' 
 #' First, the expression table, assumed to contain counts,
@@ -60,7 +58,8 @@ pcaCompGenesList <- function(components, n){
   genesCo
 }
 
-#' plotEigenValues
+
+#' Plot Eigen Values
 #' 
 #' Plot the Eigen values of the "dudi" PCA object produced by contentgenesPCA.
 #' 
@@ -75,8 +74,7 @@ pcaCompGenesList <- function(components, n){
 plotEigenValues <- function(orderedCompPca)
   barplot(orderedCompPca %$% eig, xlab = "Eigenvalues")
 
-#' plotHTB
-#' 
+
 #' plot head and tail as barplot.
 #' 
 #' @param orderedCompPca A data frame where columns are principal component,

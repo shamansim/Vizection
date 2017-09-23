@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{contentheatmapGenes}
 \alias{contentheatmapGenes}
-\title{contentheatmapGenes}
+\title{Plots Vizection's heatmap of correlations.}
 \usage{
 contentheatmapGenes(cormat, dendr, sublibs)
 }

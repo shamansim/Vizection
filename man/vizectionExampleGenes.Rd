@@ -2,12 +2,12 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{vizectionExampleGenes}
 \alias{vizectionExampleGenes}
-\title{vizectionExampleGenes}
+\title{vizection example \dQuote{genes} table}
 \usage{
 vizectionExampleGenes()
 }
 \description{
-Toy example for the "genes" table to be used in vizection.
+Toy example for the \dQuote{genes} table to be used in vizection.
 }
 \details{
 This is for debugging purposes; the example does not reflect well

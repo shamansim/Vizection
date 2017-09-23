@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{contentgenesPCA_1}
 \alias{contentgenesPCA_1}
-\title{contentgenesPCA}
+\title{Vizection's Principal Component Analysis}
 \usage{
 contentgenesPCA_1(subgenes)
 }
@@ -10,9 +10,6 @@ contentgenesPCA_1(subgenes)
 \item{df}{An expression table (see above)}
 }
 \description{
-Vizection's Principal Component Analysis
-}
-\details{
 First, the expression table, assumed to contain counts,
 is normalised to tags per million (TPM) and transposed.
 Then, the first line, containing the combined expression

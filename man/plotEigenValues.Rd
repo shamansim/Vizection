@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotEigenValues}
 \alias{plotEigenValues}
-\title{plotEigenValues}
+\title{Plot Eigen Values}
 \usage{
 plotEigenValues(orderedCompPca)
 }

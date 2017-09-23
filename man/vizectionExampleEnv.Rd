@@ -2,12 +2,12 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{vizectionExampleEnv}
 \alias{vizectionExampleEnv}
-\title{vizectionExampleEnv}
+\title{vizection example environment}
 \usage{
 vizectionExampleEnv()
 }
 \description{
-Toy example of "input" object passed by Shiny
+Toy example of \dQuote{input} object passed by Shiny
 }
 \details{
 This is for debugging purposes; the example does not reflect well

@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotHTB}
 \alias{plotHTB}
-\title{plotHTB}
+\title{plot head and tail as barplot.}
 \usage{
 plotHTB(orderedCompPca, comp, nbDispGenes = 25)
 }

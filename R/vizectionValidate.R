@@ -1,5 +1,3 @@
-#' vizectionValidate
-#' 
 #' Validate objects passed to Vizection
 #' 
 #' Makes an error with objects that do not fit the requirements for being

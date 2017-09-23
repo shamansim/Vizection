@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{corMat_1}
 \alias{corMat_1}
-\title{corMat}
+\title{Calculate a correlation matrix.}
 \usage{
 corMat_1(genes)
 }

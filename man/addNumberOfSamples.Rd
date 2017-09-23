@@ -2,7 +2,7 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{addNumberOfSamples}
 \alias{addNumberOfSamples}
-\title{addNumberOfSamples}
+\title{Add number to group names}
 \usage{
 addNumberOfSamples(libs, groups)
 }
