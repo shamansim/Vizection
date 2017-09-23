@@ -12,15 +12,16 @@
 #' @examples 
 #' data.frame(1:3, 2:4, 6:4) %>% corMat()
 
+corMat <- function(genes)
+  corMat_1(genes) %>% corMat_2 %>% corMat_3
+
 corMat_1 <- function(genes)
   genes %>% tail(-1) %>% smallCAGEqc::TPM()
 
 corMat_2 <- log1p
 
 corMat_3 <- cor
-  
-corMat <- function(genes)
-  corMat_1(genes) %>% corMat_2 %>% corMat_3
+
 
 #' Convert correlation to distance
 #' 
@@ -34,6 +35,9 @@ corMat <- function(genes)
 #' @examples 
 #' data.frame(1:3, 2:4, 6:4) %>% corMat %>% distCorMat
 
+distCorMat <- function(m)
+  m %>% distCorMat_1 %>% distCorMat_2
+
 distCorMat_1 <- function(m) {
   m %>%
     subtract(1, .) %>%
@@ -43,8 +47,6 @@ distCorMat_1 <- function(m) {
   
 distCorMat_2 <- ade4::quasieuclid
 
-distCorMat <- function(m)
-  m %>% distCorMat_1 %>% distCorMat_2
 
 #' Complete hierarchical clustering
 #' 
@@ -73,6 +75,14 @@ genesDend <- function(d)
 #'   
 #' @importFrom grDevices rainbow
 #' @importFrom colorspace rainbow_hcl
+
+genesDend2 <- function(d, x)
+  genesDend2_4( d
+                , x
+                , nbGroups = genesDend2_1(x)
+                , colGrps = genesDend2_2(genesDend2_1(x))
+                , cols = genesDend2_3(x)) %>%
+  genesDend2_5()
 
 genesDend2_1 <- function(x)
   length(x$groupsCheck)
@@ -103,14 +113,6 @@ genesDend2_4 <- function(d, x, nbGroups, colsGrps, cols) {
 
 genesDend2_5 <- function(dend)
     dend %>% dendextend::ladderize(FALSE)
-
-genesDend2 <- function(d, x)
-  genesDend2_4( d
-              , x
-              , nbGroups = genesDend2_1(x)
-              , colGrps = genesDend2_2(genesDend2_1(x))
-              , cols = genesDend2_3(x)) %>%
-    genesDend2_5()
 
 
 #' Plots Vizection's heatmap of correlations.

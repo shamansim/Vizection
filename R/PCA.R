@@ -15,6 +15,9 @@
 #' @importFrom ade4 dudi.pca
 #' @export contentgenesPCA
 
+contentgenesPCA <- function(df)
+  df %>% contentgenesPCA_1 %>% contentgenesPCA_2
+
 contentgenesPCA_1 <- function(subgenes)
   subgenes %>% smallCAGEqc::TPM() %>% t
 
@@ -24,9 +27,6 @@ contentgenesPCA_2 <- function (genesTpm)
                 , scale  = F
                 , scannf = F
                 , nf     = 3)
-  
-contentgenesPCA <- function(df)
-  df %>% contentgenesPCA_1 %>% contentgenesPCA_2
 
 
 #' pcaCompGenesList
