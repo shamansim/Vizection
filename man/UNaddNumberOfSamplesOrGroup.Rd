@@ -14,3 +14,6 @@ addNumberOfSamples.}
 \description{
 Same as above except that it does not keep name attributes.
 }
+\examples{
+c("toto | 5", "H12 | toto") \%>\% UNaddNumberOfSamplesOrGroup
+}

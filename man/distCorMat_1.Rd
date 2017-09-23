@@ -16,3 +16,6 @@ Transforms a correlation matrix into a Euclidian distance matrix.
 The final conversion is done with the quasieuclid function of the
 ade4 package.
 }
+\examples{
+data.frame(1:3, 2:4, 6:4) \%>\% corMat \%>\% distCorMat
+}

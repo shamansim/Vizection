@@ -16,3 +16,9 @@ labeled groups.}
 \description{
 Cluster a distance matrix with the complete method.
 }
+\examples{
+dendr <- data.frame(1:3, 2:4, 6:4) \%>\% corMat \%>\% distCorMat \%>\% genesDend()
+genesDend2(dendr, x = vizectionExampleEnv())
+genesDend2(dendr, x = vizectionExampleEnv() \%>\% inset("showGroupsColor", FALSE))
+  
+}

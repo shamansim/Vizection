@@ -12,3 +12,6 @@ genesDend(d)
 \description{
 Cluster a distance matrix with the complete method.
 }
+\examples{
+data.frame(1:3, 2:4, 6:4) \%>\% corMat \%>\% distCorMat \%>\% genesDend
+}

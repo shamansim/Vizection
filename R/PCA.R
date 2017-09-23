@@ -11,7 +11,7 @@
 #' 
 #' @param df An expression table (see above)
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA
 #' 
 #' @importFrom ade4 dudi.pca
@@ -41,7 +41,7 @@ contentgenesPCA <- function(df)
 #' 
 #' @return The "components" data frame, sorted on the "n"th component.
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA %>%
 #'   extract2("co") %>% pcaCompGenesList(1)
 #' 
@@ -66,7 +66,7 @@ pcaCompGenesList <- function(components, n){
 #' 
 #' @param orderedCompPca a The PCA object produced by contentgenesPCA.
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>%
 #'   contentgenesPCA %>%
 #'   plotEigenValues
@@ -85,7 +85,7 @@ plotEigenValues <- function(orderedCompPca)
 #' @param comp The number of the principal component in that matrix.
 #' @param nbDispGenes How many bars for the head and the tail (each).
 #' 
-#' @example
+#' @examples
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA %>%
 #'   extract2("co") %>% pcaCompGenesList(1) %>%
 #'   plotHTB(1)

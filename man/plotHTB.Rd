@@ -18,3 +18,9 @@ plot is already sorted.}
 \description{
 plot head and tail as barplot.
 }
+\examples{
+vizection:::vizectionExampleGenes() \%>\% contentgenesPCA \%>\%
+  extract2("co") \%>\% pcaCompGenesList(1) \%>\%
+  plotHTB(1)
+
+}

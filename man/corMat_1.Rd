@@ -17,6 +17,9 @@ match an annotation.}
 \description{
 Calculate a correlation matrix.
 }
+\examples{
+data.frame(1:3, 2:4, 6:4) \%>\% corMat()
+}
 \seealso{
 smallCAGEqc::TPM
 }

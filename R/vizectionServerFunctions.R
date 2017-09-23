@@ -5,7 +5,7 @@
 #' This is for debugging purposes; the example does not reflect well
 #' the kind of real data that is expected.
 #' 
-#' @example 
+#' @examples 
 #' summary(vizectionExampleLibs())
 #' head(vizectionExampleLibs())
 
@@ -28,7 +28,7 @@ vizectionExampleLibs <- function() {
 #' This is for debugging purposes; the example does not reflect well
 #' the kind of real data that is expected.
 #' 
-#' @example 
+#' @examples
 #' summary(vizectionExampleGenes())
 #' head(vizectionExampleGenes())
 
@@ -55,7 +55,7 @@ vizectionExampleEnv <- function()
 
 #' filterSelectionBool
 #' 
-#' @example 
+#' @examples 
 #' filterSelectionBool( libs = vizectionExampleLibs()
 #'                    , input = vizectionExampleEnv())
 
@@ -71,7 +71,7 @@ filterSelectionBool <- function(libs, input) {
 
 #' filterSelectionBoolFinal
 #' 
-#' @example 
+#' @examples 
 #' filterSelectionBoolFinal( libs  = vizectionExampleLibs()
 #'                         , input = vizectionExampleEnv())
 
@@ -147,7 +147,7 @@ addGroupName <- function(libs, samples){
 #'              have been added by the functions addGroupName or
 #'              addNumberOfSamples.
 #'
-#' @example 
+#' @examples 
 #' c("toto | 5", "H12 | toto") %>% UNaddNumberOfSamplesOrGroup
 
 UNaddNumberOfSamplesOrGroup <- function(names)

@@ -13,3 +13,7 @@ Toy example for the "genes" table to be used in vizection.
 This is for debugging purposes; the example does not reflect well
 the kind of real data that is expected.
 }
+\examples{
+summary(vizectionExampleGenes())
+head(vizectionExampleGenes())
+}

@@ -18,3 +18,8 @@ The "components" data frame, sorted on the "n"th component.
 \description{
 It's complicated...
 }
+\examples{
+vizection:::vizectionExampleGenes() \%>\% contentgenesPCA \%>\%
+  extract2("co") \%>\% pcaCompGenesList(1)
+
+}

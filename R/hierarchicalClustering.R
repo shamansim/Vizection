@@ -11,7 +11,7 @@
 #' 
 #' @seealso smallCAGEqc::TPM
 #' 
-#' @example 
+#' @examples 
 #' data.frame(1:3, 2:4, 6:4) %>% corMat()
 
 corMat_1 <- function(genes)
@@ -33,7 +33,7 @@ corMat <- function(genes)
 #' 
 #' @param m A corelation matrix.
 #' 
-#' @example 
+#' @examples 
 #' data.frame(1:3, 2:4, 6:4) %>% corMat %>% distCorMat
 
 distCorMat_1 <- function(m) {
@@ -54,7 +54,7 @@ distCorMat <- function(m)
 #' 
 #' @param d a distance matrix
 #' 
-#' @example
+#' @examples
 #' data.frame(1:3, 2:4, 6:4) %>% corMat %>% distCorMat %>% genesDend
 
 genesDend <- function(d)
@@ -69,7 +69,7 @@ genesDend <- function(d)
 #'          clusters to compute and "nbGroups" is the number of
 #'          labeled groups.
 #' 
-#' @example
+#' @examples
 #' dendr <- data.frame(1:3, 2:4, 6:4) %>% corMat %>% distCorMat %>% genesDend()
 #' genesDend2(dendr, x = vizectionExampleEnv())
 #' genesDend2(dendr, x = vizectionExampleEnv() %>% inset("showGroupsColor", FALSE))
@@ -123,7 +123,7 @@ genesDend2 <- function(d, x)
 #' @param dendr A dendrogram object like the ouptut of gendsDend2().
 #' @param sublibs A "libs" table like the output of vizectionExampleLibs().
 #' 
-#' @example
+#' @examples
 #' cormat <- vizectionExampleGenes() %>% corMat
 #' dendr <- cormat %>% distCorMat %>% genesDend %>% genesDend2(x = vizectionExampleEnv())
 #' contentheatmapGenes(cormat, dendr, vizectionExampleLibs())

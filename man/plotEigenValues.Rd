@@ -12,3 +12,9 @@ plotEigenValues(orderedCompPca)
 \description{
 Plot the Eigen values of the "dudi" PCA object produced by contentgenesPCA.
 }
+\examples{
+vizection:::vizectionExampleGenes() \%>\%
+  contentgenesPCA \%>\%
+  plotEigenValues
+  
+}

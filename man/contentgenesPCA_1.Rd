@@ -20,3 +20,7 @@ of all the CTSS that were not contained in an annotated
 feature (such as a gene), is removed.  Then the PCA is
 run with the ade4 package's function dudi.pca().
 }
+\examples{
+vizection:::vizectionExampleGenes() \%>\% contentgenesPCA
+
+}

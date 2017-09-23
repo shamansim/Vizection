@@ -16,3 +16,8 @@ contentheatmapGenes(cormat, dendr, sublibs)
 \description{
 Plots Vizection's heatmap of correlations.
 }
+\examples{
+cormat <- vizectionExampleGenes() \%>\% corMat
+dendr <- cormat \%>\% distCorMat \%>\% genesDend \%>\% genesDend2(x = vizectionExampleEnv())
+contentheatmapGenes(cormat, dendr, vizectionExampleLibs())
+}
