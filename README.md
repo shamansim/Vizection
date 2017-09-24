@@ -13,22 +13,15 @@ Load the library:
 
     library(vizection) # Note the lowercase 'v'
     
-If you do not have any dataset you can generate some:
+If you do not have any dataset you can try vizection on some example
+data from Bioconductor, for instance the SummarizedExperiment object
+provided by the [airway](https://bioconductor.org/packages/airway) package.
 
-```
-data(iris)
-genes <- iris[, 1:4]
-libs <- as.data.frame(iris[, "Species"])
-colnames(libs) <- c('group')
-libs$samplename <- as.character(1:nrow(genes))
-rownames(libs) <- libs$samplename 
-libs$counts <- rnorm(n = nrow(genes), mean = 1000, sd = 200)
-genes <- as.data.frame(t(genes))
-
-```
+    data("airway", package = "airway")
+    airway$group <- airway$dex
 
 Start vizection:
 
-    vizection(genes = genes, libs = libs, local = FALSE) # local = TRUE implies host="0.0.0.0" 
+    vizection(airway, local = FALSE) # local = TRUE implies host="0.0.0.0" 
 
 Documentation is under way, some features are still not working properly, please be patient :)
