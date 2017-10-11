@@ -10,8 +10,21 @@ library(data.table)
 library(DT)
 library(plotly)
 
-genes <- get(getOption("vizection.genes"), .GlobalEnv)
-libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
+if (getOption("vizection.dataIs") == "genesAndLibs") {
+  genes <- get(getOption("vizection.genes"), .GlobalEnv)
+  libs  <- get(getOption("vizection.libs"),  .GlobalEnv)
+} else if (getOption("vizection.dataIs") == "se") {
+  se    <- get(getOption("vizection.se"),  .GlobalEnv)
+  genes <- SummarizedExperiment::assay(se)   %>% data.frame
+  libs  <- SummarizedExperiment::colData(se) %>% data.frame(stringsAsFactors = FALSE)
+  libs$samplename <- rownames(libs)
+  libs$counts     <- colSums(genes)
+} else stop("Could not detect what data to load.")
+
+if (is.null(libs$group))
+  libs$group <- "No groups"
+
+libs$group %<>% factor
 
 vizectionValidate(genes = genes, libs = libs)
 
