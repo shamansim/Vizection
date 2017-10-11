@@ -4,7 +4,7 @@
 \alias{vizection}
 \title{Launch the Vizection shiny application.}
 \usage{
-vizection(genes = genes, libs = libs, local = F)
+vizection(se, genes, libs, local = F)
 }
 \arguments{
 \item{local}{T if you want host to be "0.0.0.0"}
@@ -17,5 +17,22 @@ update the global options (\code{vizection.genes} and \code{vizection.libs})
 that Vizection uses to find the objects in the global environment.
 }
 \examples{
-vizection(genes, libs, F)
+\dontrun{
+library("airway")
+data("airway")
+se <- airway
+vizection(se)
+
+
+# Older way to run Vizection:
+data(iris)
+genes <- iris[, 1:4]
+libs <- as.data.frame(iris[, "Species"])
+colnames(libs) <- c('group')
+libs$samplename <- as.character(1:nrow(genes))
+rownames(libs) <- libs$samplename 
+libs$counts <- rnorm(n = nrow(genes), mean = 1000, sd = 200)
+genes <- as.data.frame(t(genes))
+vizection(genes = genes, libs = libs, local = FALSE)
+}
 }
