@@ -2,7 +2,7 @@
 % Please edit documentation in R/hierarchicalClustering.R
 \name{genesDend}
 \alias{genesDend}
-\title{genesDend}
+\title{Complete hierarchical clustering}
 \usage{
 genesDend(d)
 }
@@ -11,4 +11,7 @@ genesDend(d)
 }
 \description{
 Cluster a distance matrix with the complete method.
+}
+\examples{
+data.frame(1:3, 2:4, 6:4) \%>\% corMat \%>\% distCorMat \%>\% genesDend
 }

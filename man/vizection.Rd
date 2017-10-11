@@ -2,7 +2,7 @@
 % Please edit documentation in R/start.R
 \name{vizection}
 \alias{vizection}
-\title{Vizection}
+\title{Launch the Vizection shiny application.}
 \usage{
 vizection(se, genes, libs, local = F)
 }
@@ -10,9 +10,6 @@ vizection(se, genes, libs, local = F)
 \item{local}{T if you want host to be "0.0.0.0"}
 }
 \description{
-This function launches the Vizection shiny application.
-}
-\details{
 By default, Vizection will look for two data frames called \dQuote{genes}
 and \dQuote{libs}.  Alternatively, these data frames can be passed as
 arguments to the \code{vizection()} function.  Their names will be used to

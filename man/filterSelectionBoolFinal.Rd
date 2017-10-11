@@ -9,3 +9,7 @@ filterSelectionBoolFinal(libs, input)
 \description{
 filterSelectionBoolFinal
 }
+\examples{
+filterSelectionBoolFinal( libs  = vizectionExampleLibs()
+                        , input = vizectionExampleEnv())
+}

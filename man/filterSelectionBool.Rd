@@ -2,10 +2,14 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{filterSelectionBool}
 \alias{filterSelectionBool}
-\title{filterSelectionBool}
+\title{Apply filters to samples}
 \usage{
 filterSelectionBool(libs, input)
 }
 \description{
-filterSelectionBool
+Apply filters to samples
+}
+\examples{
+filterSelectionBool( libs = vizectionExampleLibs()
+                   , input = vizectionExampleEnv())
 }

@@ -1,6 +1,4 @@
-#' Vizection
-#'
-#' This function launches the Vizection shiny application.
+#' Launch the Vizection shiny application.
 #' 
 #' By default, Vizection will look for two data frames called \dQuote{genes}
 #' and \dQuote{libs}.  Alternatively, these data frames can be passed as

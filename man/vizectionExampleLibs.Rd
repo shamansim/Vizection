@@ -2,14 +2,18 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{vizectionExampleLibs}
 \alias{vizectionExampleLibs}
-\title{vizectionExampleLibs}
+\title{vizection example \dQuote{libs} table}
 \usage{
 vizectionExampleLibs()
 }
 \description{
-Toy example for the "libs" table to be used in vizection.
+Toy example for the \dQuote{libs} table to be used in vizection.
 }
 \details{
 This is for debugging purposes; the example does not reflect well
 the kind of real data that is expected.
+}
+\examples{
+summary(vizectionExampleLibs())
+head(vizectionExampleLibs())
 }

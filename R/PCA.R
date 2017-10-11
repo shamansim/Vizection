@@ -1,5 +1,3 @@
-#' contentgenesPCA
-#' 
 #' Vizection's Principal Component Analysis
 #' 
 #' First, the expression table, assumed to contain counts,
@@ -11,11 +9,14 @@
 #' 
 #' @param df An expression table (see above)
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA
 #' 
 #' @importFrom ade4 dudi.pca
 #' @export contentgenesPCA
+
+contentgenesPCA <- function(df)
+  df %>% contentgenesPCA_1 %>% contentgenesPCA_2
 
 contentgenesPCA_1 <- function(subgenes)
   subgenes %>% smallCAGEqc::TPM() %>% t
@@ -26,9 +27,6 @@ contentgenesPCA_2 <- function (genesTpm)
                 , scale  = F
                 , scannf = F
                 , nf     = 3)
-  
-contentgenesPCA <- function(df)
-  df %>% contentgenesPCA_1 %>% contentgenesPCA_2
 
 
 #' pcaCompGenesList
@@ -41,7 +39,7 @@ contentgenesPCA <- function(df)
 #' 
 #' @return The "components" data frame, sorted on the "n"th component.
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA %>%
 #'   extract2("co") %>% pcaCompGenesList(1)
 #' 
@@ -60,13 +58,14 @@ pcaCompGenesList <- function(components, n){
   genesCo
 }
 
-#' plotEigenValues
+
+#' Plot Eigen Values
 #' 
 #' Plot the Eigen values of the "dudi" PCA object produced by contentgenesPCA.
 #' 
 #' @param orderedCompPca a The PCA object produced by contentgenesPCA.
 #' 
-#' @example 
+#' @examples 
 #' vizection:::vizectionExampleGenes() %>%
 #'   contentgenesPCA %>%
 #'   plotEigenValues
@@ -75,8 +74,7 @@ pcaCompGenesList <- function(components, n){
 plotEigenValues <- function(orderedCompPca)
   barplot(orderedCompPca %$% eig, xlab = "Eigenvalues")
 
-#' plotHTB
-#' 
+
 #' plot head and tail as barplot.
 #' 
 #' @param orderedCompPca A data frame where columns are principal component,
@@ -85,7 +83,7 @@ plotEigenValues <- function(orderedCompPca)
 #' @param comp The number of the principal component in that matrix.
 #' @param nbDispGenes How many bars for the head and the tail (each).
 #' 
-#' @example
+#' @examples
 #' vizection:::vizectionExampleGenes() %>% contentgenesPCA %>%
 #'   extract2("co") %>% pcaCompGenesList(1) %>%
 #'   plotHTB(1)

@@ -1,11 +1,11 @@
-#' vizectionExampleLibs
+#' vizection example \dQuote{libs} table
 #' 
-#' Toy example for the "libs" table to be used in vizection.
+#' Toy example for the \dQuote{libs} table to be used in vizection.
 #' 
 #' This is for debugging purposes; the example does not reflect well
 #' the kind of real data that is expected.
 #' 
-#' @example 
+#' @examples 
 #' summary(vizectionExampleLibs())
 #' head(vizectionExampleLibs())
 
@@ -21,14 +21,14 @@ vizectionExampleLibs <- function() {
   libs
 }
 
-#' vizectionExampleGenes
+#' vizection example \dQuote{genes} table
 #' 
-#' Toy example for the "genes" table to be used in vizection.
+#' Toy example for the \dQuote{genes} table to be used in vizection.
 #' 
 #' This is for debugging purposes; the example does not reflect well
 #' the kind of real data that is expected.
 #' 
-#' @example 
+#' @examples
 #' summary(vizectionExampleGenes())
 #' head(vizectionExampleGenes())
 
@@ -38,9 +38,9 @@ vizectionExampleGenes <- function() {
   genes <- as.data.frame(t(genes))
 }
 
-#' vizectionExampleEnv
+#' vizection example environment
 #' 
-#' Toy example of "input" object passed by Shiny
+#' Toy example of \dQuote{input} object passed by Shiny
 #' 
 #' This is for debugging purposes; the example does not reflect well
 #' the kind of real data that is expected.
@@ -53,9 +53,9 @@ vizectionExampleEnv <- function()
       , groupsCheck       = c("setosa | 5", "virginica | 10")
       , samplesCheck      = c("1 | setosa", "150 | virginica"))
 
-#' filterSelectionBool
+#' Apply filters to samples
 #' 
-#' @example 
+#' @examples 
 #' filterSelectionBool( libs = vizectionExampleLibs()
 #'                    , input = vizectionExampleEnv())
 
@@ -71,7 +71,7 @@ filterSelectionBool <- function(libs, input) {
 
 #' filterSelectionBoolFinal
 #' 
-#' @example 
+#' @examples 
 #' filterSelectionBoolFinal( libs  = vizectionExampleLibs()
 #'                         , input = vizectionExampleEnv())
 
@@ -105,7 +105,7 @@ sublibs <- function(libs, input) {
   sublibs0
 }
 
-#' addNumberOfSamples
+#' Add number to group names
 #' 
 #' Displays something like "groupname | n".
 #' 
@@ -123,7 +123,7 @@ addNumberOfSamples <- function(libs, groups){
   result
 }
 
-#' addGroupName
+#' Add group name to samples
 #' 
 #' Displays something like "samplename | groupname".
 #' 
@@ -139,7 +139,7 @@ addGroupName <- function(libs, samples){
   return(result)
 }
 
-#' UNaddNumberOfSamplesOrGroup
+#' Clear sample or group names.
 #'
 #' Same as above except that it does not keep name attributes.
 #'
@@ -147,7 +147,7 @@ addGroupName <- function(libs, samples){
 #'              have been added by the functions addGroupName or
 #'              addNumberOfSamples.
 #'
-#' @example 
+#' @examples 
 #' c("toto | 5", "H12 | toto") %>% UNaddNumberOfSamplesOrGroup
 
 UNaddNumberOfSamplesOrGroup <- function(names)

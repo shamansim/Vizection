@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotHTB}
 \alias{plotHTB}
-\title{plotHTB}
+\title{plot head and tail as barplot.}
 \usage{
 plotHTB(orderedCompPca, comp, nbDispGenes = 25)
 }
@@ -17,4 +17,10 @@ plot is already sorted.}
 }
 \description{
 plot head and tail as barplot.
+}
+\examples{
+vizection:::vizectionExampleGenes() \%>\% contentgenesPCA \%>\%
+  extract2("co") \%>\% pcaCompGenesList(1) \%>\%
+  plotHTB(1)
+
 }

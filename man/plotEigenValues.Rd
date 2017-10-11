@@ -2,7 +2,7 @@
 % Please edit documentation in R/PCA.R
 \name{plotEigenValues}
 \alias{plotEigenValues}
-\title{plotEigenValues}
+\title{Plot Eigen Values}
 \usage{
 plotEigenValues(orderedCompPca)
 }
@@ -11,4 +11,10 @@ plotEigenValues(orderedCompPca)
 }
 \description{
 Plot the Eigen values of the "dudi" PCA object produced by contentgenesPCA.
+}
+\examples{
+vizection:::vizectionExampleGenes() \%>\%
+  contentgenesPCA \%>\%
+  plotEigenValues
+  
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{addGroupName}
 \alias{addGroupName}
-\title{addGroupName}
+\title{Add group name to samples}
 \usage{
 addGroupName(libs, samples)
 }

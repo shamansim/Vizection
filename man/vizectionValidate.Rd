@@ -2,7 +2,7 @@
 % Please edit documentation in R/vizectionValidate.R
 \name{vizectionValidate}
 \alias{vizectionValidate}
-\title{vizectionValidate}
+\title{Validate objects passed to Vizection}
 \usage{
 vizectionValidate(genes, libs)
 }
@@ -12,9 +12,6 @@ vizectionValidate(genes, libs)
 \item{libs}{A \sQuote{libs} table.}
 }
 \description{
-Validate objects passed to Vizection
-}
-\details{
 Makes an error with objects that do not fit the requirements for being
 used in Vizection
 }

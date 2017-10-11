@@ -2,7 +2,7 @@
 % Please edit documentation in R/vizectionServerFunctions.R
 \name{UNaddNumberOfSamplesOrGroup}
 \alias{UNaddNumberOfSamplesOrGroup}
-\title{UNaddNumberOfSamplesOrGroup}
+\title{Clear sample or group names.}
 \usage{
 UNaddNumberOfSamplesOrGroup(names)
 }
@@ -13,4 +13,7 @@ addNumberOfSamples.}
 }
 \description{
 Same as above except that it does not keep name attributes.
+}
+\examples{
+c("toto | 5", "H12 | toto") \%>\% UNaddNumberOfSamplesOrGroup
 }
