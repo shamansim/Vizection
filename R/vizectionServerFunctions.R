@@ -152,3 +152,13 @@ addGroupName <- function(libs, samples){
 
 UNaddNumberOfSamplesOrGroup <- function(names)
   gsub("\\s[:|:]\\s.*", "", names)
+
+#' showDendrColors
+
+showDendrColors <- function(dendro){
+  dendrapply(dendro, function(X){
+    if(is.leaf(X)){
+      attr(X, "edgePar")[1]
+    }
+  }) %>% unlist
+}

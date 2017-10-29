@@ -28,14 +28,6 @@ libs$group %<>% factor
 
 vizectionValidate(genes = genes, libs = libs)
 
-showDendrColors <- function(dendro){
-  dendrapply(dendro, function(X){
-    if(is.leaf(X)){
-      attr(X, "edgePar")[1]
-    }
-  }) %>% unlist
-}
-
 shinyServer(function(input, output, session) {
   
   # FILTERS
@@ -175,7 +167,7 @@ shinyServer(function(input, output, session) {
       incProgress(1/3, detail = "collecting nb clusters")
       ifelse(input$nbClusters!= 1, palette(rainbow_hcl(input$nbClusters, c=50, l=100)), palette(rainbow_hcl(2, c=50, l=100)))
       incProgress(2/3, detail = "generating colors")
-      data.frame(colors = showDendrColors(genesDend2()), sampleIndex = order.dendrogram(genesDend2())) %>%
+      data.frame(colors = vizection:::showDendrColors(genesDend2()), sampleIndex = order.dendrogram(genesDend2())) %>%
         setorder("sampleIndex") %$%
         return(colors)
     })
