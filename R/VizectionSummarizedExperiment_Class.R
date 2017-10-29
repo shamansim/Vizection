@@ -9,7 +9,8 @@ setClass(
   representation = representation(
     dendrogram = "dendrogram",
     pca = "pca",
-    coa = "coa"),
+    coa = "coa",
+    vizectionParams = "list"),
   contains = "SummarizedExperiment"
 )
 
