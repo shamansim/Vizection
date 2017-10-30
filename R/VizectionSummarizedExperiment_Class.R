@@ -4,6 +4,18 @@ setOldClass("dendrogram")
 setOldClass("pca")
 setOldClass("coa")
 
+#' VizectionSummarizedExperiment, S4 class that extends \code{"SummarizedExperiment"} class.
+#'
+#' Extension is to add the results of the analyses runned in Vizection as well
+#' as recording session version (new feature to come).
+#'
+#' @slot dendrogram The dendrogram computed in vizection.
+#' @slot pca A principal components analysis runned with \code{ade4} package.
+#' @slot coa A correspondance analysis runned with \code{ade4} package.
+#' @slot vizectionParams List of parameters used as metadata for running Vizection sessions.
+#'
+#' @name VizectionSummarizedExperiment
+#' @export
 setClass(
   Class = "VizectionSummarizedExperiment",
   representation = representation(
