@@ -1,3 +1,7 @@
+# Pretty important to load before ----------------------------------------------
+
+library(SummarizedExperiment)
+
 # Class definition -------------------------------------------------------------
 
 setOldClass("dendrogram")
