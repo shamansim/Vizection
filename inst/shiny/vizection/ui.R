@@ -328,8 +328,7 @@ dashboardPage(
           ),
           tabPanel("Plots",
                    fluidRow(
-                     column(2, radioButtons("PCAcolor", "Color points by:", choices = list("biological groups" = 1, "dendrogram clusters" = 2, "k-means clusters" = 3), selected = 1)),
-                     column(2, checkboxInput("showEllipse", "Show ellipse(s)", value = F))
+                     column(2, radioButtons("PCAcolor", "Color points by:", choices = list("biological groups" = 1, "dendrogram clusters" = 2, "k-means clusters" = 3), selected = 1))
                    ),
                    tabsetPanel(
                      tabPanel("2D",

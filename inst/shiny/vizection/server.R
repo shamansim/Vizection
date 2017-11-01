@@ -532,11 +532,7 @@ shinyServer(function(input, output, session) {
   ####
   g12li <- eventReactive(input$updatePCAPlots, {
     genesPcali <- genesPca()$li
-    if(input$showEllipse){
-      ggplot(genesPcali, aes(x = Axis1, y = Axis2, group = pcaGroup(), color = pcaColor(), fill = pcaColor())) + stat_ellipse(aes(color = pcaColor(), fill = pcaColor()))}
-    else {
-      ggplot(genesPcali, aes(x = Axis1, y = Axis2, group = pcaGroup(), color = pcaColor()))
-    }
+    ggplot(genesPcali, aes(x = Axis1, y = Axis2, group = pcaGroup(), color = pcaColor()))
   })
   contentinteractPCA12li <- reactive({
     withProgress(message = 'li axes 1-2', {
